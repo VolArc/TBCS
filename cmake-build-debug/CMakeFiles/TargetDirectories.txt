@@ -1,0 +1,3 @@
+/home/grzegorz/HSE/TBCS/cmake-build-debug/CMakeFiles/TBCS.dir
+/home/grzegorz/HSE/TBCS/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/grzegorz/HSE/TBCS/cmake-build-debug/CMakeFiles/rebuild_cache.dir

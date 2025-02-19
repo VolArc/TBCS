@@ -1,0 +1,18 @@
+{
+	"bmi-installation" : null,
+	"compiler-frontend-variant" : "GNU",
+	"compiler-id" : "GNU",
+	"compiler-simulate-id" : "",
+	"config" : "Debug",
+	"cxx-modules" : {},
+	"dir-cur-bld" : "/home/grzegorz/HSE/TBCS/cmake-build-debug",
+	"dir-cur-src" : "/home/grzegorz/HSE/TBCS",
+	"dir-top-bld" : "/home/grzegorz/HSE/TBCS/cmake-build-debug",
+	"dir-top-src" : "/home/grzegorz/HSE/TBCS",
+	"exports" : [],
+	"forward-modules-from-target-dirs" : [],
+	"include-dirs" : [],
+	"language" : "CXX",
+	"linked-target-dirs" : [],
+	"module-dir" : "/home/grzegorz/HSE/TBCS/cmake-build-debug/CMakeFiles/TBCS.dir"
+}
