@@ -89,8 +89,8 @@ public:
     [[nodiscard]] std::string FindByName(const std::string &name, char split, int order = 0) const;
     [[nodiscard]] Node *FindByPrice(int price, int order = 0) const;
     [[nodiscard]] std::string FindByPrice (int price, char split, int order = 0) const;
-    [[nodiscard]] std::string Show () const;
-    static void Show(const Node *node, std::string &output, int depth = 0);
+    [[nodiscard]] std::string Show (bool byName = true) const;
+    static void Show(const Node *node, std::string &output, bool byName = true, int depth = 0);
 };
 
 BinaryTree::BinaryTree() {
@@ -168,16 +168,16 @@ std::string BinaryTree::FindByPrice(const int price, const char split, int order
     return temp != nullptr ? temp->ToString(split) : " ";
 }
 
-void BinaryTree::Show(const Node *node, std::string &output, const int depth) {
+void BinaryTree::Show(const Node *node, std::string &output, const bool byName, const int depth) {
     if (!node) return;
-    Show(node->pRightByName, output, depth + 1);
+    Show(byName ? node-> pRightByName : node->pRightByPrice, output, byName, depth + 1);
     output += std::string(depth * 20, ' ') + node->ToString() + "\n";
-    Show(node->pLeftByName, output, depth + 1);
+    Show(byName ? node->pLeftByName : node->pLeftByPrice, output, byName, depth + 1);
 }
 
-std::string BinaryTree::Show() const {
+std::string BinaryTree::Show(const bool byName) const {
     std::string output;
-    Show(pRootByName, output);
+    Show(byName ? pRootByName : pRootByPrice, output, byName);
     return output;
 }
 
@@ -351,10 +351,10 @@ std::string List::Show(const char split, const int order) const {
     const Node *pCurrent;
 
     switch (order) {
-        case 1:
+        case 0:
             pCurrent = pHeadByName;
             break;
-        case 2:
+        case 1:
             pCurrent = pHeadByPrice;
             break;
         default:
@@ -366,8 +366,8 @@ std::string List::Show(const char split, const int order) const {
 
     while (pCurrent != nullptr) {
         result += pCurrent->ToString() + split;
-        pCurrent = order == 1 ? pCurrent->pNextByName :
-                   order == 2 ? pCurrent->pNextByPrice :
+        pCurrent = order == 0 ? pCurrent->pNextByName :
+                   order == 1 ? pCurrent->pNextByPrice :
                    pCurrent->pNextByInput;
     }
 
@@ -393,7 +393,7 @@ void inputPush (BinaryTree *tree, List *listC, int count = 20) {
     while (count-- > 0) {
         temp.name = InputString("Введите название (Чтобы закончить, нажмите Enter, ничего не вводя.):", true);
 
-        if (temp.name.empty())
+        if (Trim(temp.name).empty())
             break;
 
         temp.origin = InputString("Введите страну происхождения:");
@@ -405,19 +405,31 @@ void inputPush (BinaryTree *tree, List *listC, int count = 20) {
 }
 
 
-int main() {
+int main(int argc, char *argv[]) {
+    #ifdef _WIN32
+    SetConsoleCP( 65001 );
+    SetConsoleOutputCP( 65001 );
+    #endif
+    std::cout << "\x1B[41mВНИМАНИЕ!!!\nСправка.\033[0m\n"
+                 "Рекомендуется открыть программу в отдельном терминале, а не в терминале IDE.\n"
+                 "Для перемещения между кнопками меню использовать стрелки вверх и вниз, либо кнопки W и S.\n"
+                 "Для выбора пункта меню использовать Enter или кнопку E.\n"
+                 "Если кнопки не работают, попробуйте переключить язык на английский и отключить Caps Lock.\n"
+                 "Если и это не сработает, поставьте Linux. Именно под него писалась прога. Там всё работает.\n\n"
+                 "Нажимая на любую кнопку, вы передаёте мне все сохранённые на устройстве пароли и персональные данные и соглашаетесь на их обработку. (или нет) . . .";
+    Pause();
     BinaryTree coffeeTree;
     List coffeeList;
     int count = 20;
     char yesNoOptions[2][1024] = {"Да", "Нет"};
 
     if (Menu (yesNoOptions, 2, const_cast<char *>("Загрузить данные из шаблона?")) == 0) {
-        push(&coffeeTree, &coffeeList, CoffeeVariety("Иргачиф", "Эфиопия", "Светлая", 50, 46));
-        push(&coffeeTree, &coffeeList, CoffeeVariety("Супремо", "Колумбия", "Средняя", 60, 30));
-        push(&coffeeTree, &coffeeList, CoffeeVariety("Сантос", "Бразилия", "Средняя", 60, 28));
-        push(&coffeeTree, &coffeeList, CoffeeVariety("Малабарский муссон", "Индия", "Тёмная", 70, 29));
-        push(&coffeeTree, &coffeeList, CoffeeVariety("Антигуа", "Гватемала", "Светлая", 50, 35));
-        push(&coffeeTree, &coffeeList, CoffeeVariety("Тарразу", "Коста Рика", "Средняя", 60, 38));
+        push(&coffeeTree, &coffeeList, CoffeeVariety{"Иргачиф", "Эфиопия", "Светлая", 50, 46});
+        push(&coffeeTree, &coffeeList, CoffeeVariety{"Супремо", "Колумбия", "Средняя", 60, 30});
+        push(&coffeeTree, &coffeeList, CoffeeVariety{"Сантос", "Бразилия", "Средняя", 60, 28});
+        push(&coffeeTree, &coffeeList, CoffeeVariety{"Малабарский муссон", "Индия", "Тёмная", 70, 29});
+        push(&coffeeTree, &coffeeList, CoffeeVariety{"Антигуа", "Гватемала", "Светлая", 50, 35});
+        push(&coffeeTree, &coffeeList, CoffeeVariety{"Тарразу", "Коста Рика", "Средняя", 60, 38});
         std::cout << "Загружено:\n" << coffeeList.Show() << '\n';
         count -= 6;
     }
@@ -429,7 +441,7 @@ int main() {
 
     while (isRunning) {
         char options[][1024] = {"Показать список", "Найти по названию", "Найти по цене", "Показать дерево", "Выйти"};
-        char sortOptions[][1024] = {"По порядку добавления", "По названию", "По цене"};
+        char sortOptions[][1024] = {"По названию", "По цене", "По порядку добавления"};
         switch (Menu(options, 5, const_cast<char *>("Выберите действие:"), content)) {
             case 0: {
                 content = coffeeList.Show('\n', Menu (sortOptions, 3, const_cast<char *>("Выберите порядок:"), content));
@@ -439,25 +451,28 @@ int main() {
                 std::string searchName = InputString("Введите название:");
                 int order = 0;
                 content = "";
+                std::string coffeeString = coffeeList.FindByName(searchName, ' ', order);
 
-                if (std::string coffeeString = coffeeList.FindByName(searchName, ' ', order); coffeeString.empty())
+                if (coffeeString.empty())
                     content = "Такого элемента нет.";
                 else {
+                    coffeeString = "1. " + coffeeString;
                     content += coffeeString + '\n';
 
                     while (!coffeeString.empty()) {
-                        coffeeString = coffeeList.FindByName(searchName, ' ', ++order);
+                        coffeeString = static_cast<char>(order + 1) + ". " + coffeeList.FindByName(searchName, ' ', ++order);
                         content += coffeeString + '\n';
                     }
                 }
                 break;
             }
             case 2: {
-                int searchPrice = InputInt("Введите цену:");
+                const int searchPrice = InputInt("Введите цену:");
                 int order = 0;
                 content = "";
+                std::string coffeeString = coffeeList.FindByPrice(searchPrice, ' ', order);
 
-                if (std::string coffeeString = coffeeList.FindByPrice(searchPrice, ' ', order); coffeeString.empty())
+                if (coffeeString.empty())
                     content = "Такого элемента нет.";
                 else {
                     content += coffeeString + '\n';
@@ -470,7 +485,7 @@ int main() {
                 break;
             }
             case 3: {
-                content = coffeeTree.Show();
+                content = coffeeTree.Show(Menu (sortOptions, 2, const_cast<char *>("Выберите порядок:"), content) == 0);
                 break;
             }
             default: {

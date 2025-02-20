@@ -11,7 +11,7 @@
     #include <conio.h>
     #define CLEAR "cls"
     #define PAUSE system("pause");
-    #define GETCHAR getch()
+    #define GETCHAR _getch()
 #else
     #include <termios.h>
     #define CLEAR "clear"
@@ -19,12 +19,28 @@
     #define GETCHAR getchar()
 #endif
 
-inline int Menu(char options[][1024], const int numOptions, char message[], const std::string& content = "") {
+inline void Pause() {
+#ifndef _WIN32
     termios oldt{}, newt{};
     tcgetattr(STDIN_FILENO, &oldt);
     newt = oldt;
     newt.c_lflag &= ~(ICANON | ECHO);
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+#endif
+    PAUSE;
+#ifndef _WIN32
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+#endif
+}
+
+inline int Menu(char options[][1024], const int numOptions, char message[], const std::string& content = "") {
+    #ifndef _WIN32
+    termios oldt{}, newt{};
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    #endif
     int chosenOption = 0;
 
     while (true) {
@@ -43,17 +59,21 @@ inline int Menu(char options[][1024], const int numOptions, char message[], cons
         if (!content.empty())
             std::cout << content;
 
+#ifdef _WIN32
         int command = GETCHAR;
 
-#ifdef _WIN32
-        if (command == '\224') {
-            switch (GETCHAR) {
-                case '\72': command = 'w'; break;
-                case '\080': command = 's'; break;
-                default: break;
+        if (command == 224) {
+            command = _getch();
+            switch (command) {
+                case 72: command = 'w'; break;
+                case 80: command = 's'; break;
             }
         }
+
+        else if (command == 13) command = 'e';
 #else
+
+        int command = GETCHAR;
         if (command == '\033') {
             if (GETCHAR == '[') {
                 switch (GETCHAR) {
@@ -82,7 +102,9 @@ inline int Menu(char options[][1024], const int numOptions, char message[], cons
                 break;
             }
             case 'e':
+                #ifndef _WIN32
                 tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+                #endif
                 return chosenOption;
             default: break;
         }
@@ -179,7 +201,7 @@ inline std::string Trim (std::string str) {
 #ifdef _WIN32
 inline std::string InputString(const std::string &message = "", const bool emptyAllowed = false) {
     if (!message.empty()) {
-        std::cout << message << '\n';
+        std::cout << '\n' << message << '\n';
     }
 
     std::string input;
@@ -188,6 +210,7 @@ inline std::string InputString(const std::string &message = "", const bool empty
         c = GETCHAR;
         if (c == 8) {
             if (!input.empty()) {
+                input.pop_back();
                 input.pop_back();
                 std::cout << "\b \b";
             }
@@ -213,11 +236,12 @@ inline std::string InputString (const std::string &message = "", const bool empt
     }
 
     std::string input;
-    char c;
+    char c = 0;
     while (c != '\n' || (Trim(input).empty() && !emptyAllowed)) {
         read(STDIN_FILENO, &c, 1);
         if (c == 127) {
             if (!input.empty()) {
+                input.pop_back();
                 input.pop_back();
                 write(STDOUT_FILENO, "\b \b", 3);
             }

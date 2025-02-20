@@ -76912,32 +76912,76 @@ extern __pid_t tcgetsid (int __fd) noexcept (true);
 
 
 # 22 "/home/grzegorz/HSE/TBCS/interface.h"
-inline int Menu(char options[][1024], const int numOptions, char message[], const std::string& content = "") {
+inline void Pause() {
+
     termios oldt{}, newt{};
     tcgetattr(
-# 24 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 25 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
              0
-# 24 "/home/grzegorz/HSE/TBCS/interface.h"
+# 25 "/home/grzegorz/HSE/TBCS/interface.h"
                          , &oldt);
     newt = oldt;
     newt.c_lflag &= ~(
-# 26 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 27 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
                      0000002 
-# 26 "/home/grzegorz/HSE/TBCS/interface.h"
+# 27 "/home/grzegorz/HSE/TBCS/interface.h"
                             | 
-# 26 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 27 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
                               0000010
-# 26 "/home/grzegorz/HSE/TBCS/interface.h"
+# 27 "/home/grzegorz/HSE/TBCS/interface.h"
                                   );
     tcsetattr(
-# 27 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 28 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
              0
-# 27 "/home/grzegorz/HSE/TBCS/interface.h"
+# 28 "/home/grzegorz/HSE/TBCS/interface.h"
                          , 
-# 27 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 28 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
                            0
-# 27 "/home/grzegorz/HSE/TBCS/interface.h"
+# 28 "/home/grzegorz/HSE/TBCS/interface.h"
                                   , &newt);
+
+    getchar();
+
+    tcsetattr(
+# 32 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+             0
+# 32 "/home/grzegorz/HSE/TBCS/interface.h"
+                         , 
+# 32 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+                           0
+# 32 "/home/grzegorz/HSE/TBCS/interface.h"
+                                  , &oldt);
+
+}
+
+inline int Menu(char options[][1024], const int numOptions, char message[], const std::string& content = "") {
+
+    termios oldt{}, newt{};
+    tcgetattr(
+# 39 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+             0
+# 39 "/home/grzegorz/HSE/TBCS/interface.h"
+                         , &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~(
+# 41 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+                     0000002 
+# 41 "/home/grzegorz/HSE/TBCS/interface.h"
+                            | 
+# 41 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+                              0000010
+# 41 "/home/grzegorz/HSE/TBCS/interface.h"
+                                  );
+    tcsetattr(
+# 42 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+             0
+# 42 "/home/grzegorz/HSE/TBCS/interface.h"
+                         , 
+# 42 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+                           0
+# 42 "/home/grzegorz/HSE/TBCS/interface.h"
+                                  , &newt);
+
     int chosenOption = 0;
 
     while (true) {
@@ -76955,9 +76999,8 @@ inline int Menu(char options[][1024], const int numOptions, char message[], cons
 
         if (!content.empty())
             std::cout << content;
-
+# 76 "/home/grzegorz/HSE/TBCS/interface.h"
         int command = getchar();
-# 57 "/home/grzegorz/HSE/TBCS/interface.h"
         if (command == '\033') {
             if (getchar() == '[') {
                 switch (getchar()) {
@@ -76986,50 +77029,52 @@ inline int Menu(char options[][1024], const int numOptions, char message[], cons
                 break;
             }
             case 'e':
+
                 tcsetattr(
-# 85 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 106 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
                          0
-# 85 "/home/grzegorz/HSE/TBCS/interface.h"
+# 106 "/home/grzegorz/HSE/TBCS/interface.h"
                                      , 
-# 85 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 106 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
                                        0
-# 85 "/home/grzegorz/HSE/TBCS/interface.h"
+# 106 "/home/grzegorz/HSE/TBCS/interface.h"
                                               , &oldt);
+
                 return chosenOption;
             default: break;
         }
     }
 }
-# 124 "/home/grzegorz/HSE/TBCS/interface.h"
+# 146 "/home/grzegorz/HSE/TBCS/interface.h"
 inline int InputInt(const std::string &message = "", const int max = 
-# 124 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 146 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
                                                                     (2147483647)
-# 124 "/home/grzegorz/HSE/TBCS/interface.h"
+# 146 "/home/grzegorz/HSE/TBCS/interface.h"
                                                                              ) {
     termios oldt{}, newt{};
     tcgetattr(
-# 126 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 148 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
              0
-# 126 "/home/grzegorz/HSE/TBCS/interface.h"
+# 148 "/home/grzegorz/HSE/TBCS/interface.h"
                          , &oldt);
     newt = oldt;
     newt.c_lflag &= ~(
-# 128 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 150 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
                      0000002 
-# 128 "/home/grzegorz/HSE/TBCS/interface.h"
+# 150 "/home/grzegorz/HSE/TBCS/interface.h"
                             | 
-# 128 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 150 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
                               0000010
-# 128 "/home/grzegorz/HSE/TBCS/interface.h"
+# 150 "/home/grzegorz/HSE/TBCS/interface.h"
                                   );
     tcsetattr(
-# 129 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 151 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
              0
-# 129 "/home/grzegorz/HSE/TBCS/interface.h"
+# 151 "/home/grzegorz/HSE/TBCS/interface.h"
                          , 
-# 129 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 151 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
                            0
-# 129 "/home/grzegorz/HSE/TBCS/interface.h"
+# 151 "/home/grzegorz/HSE/TBCS/interface.h"
                                   , &newt);
 
     if (!message.empty()) {
@@ -77040,9 +77085,9 @@ inline int InputInt(const std::string &message = "", const int max =
     char c;
 
     while (read(
-# 138 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 160 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
                0
-# 138 "/home/grzegorz/HSE/TBCS/interface.h"
+# 160 "/home/grzegorz/HSE/TBCS/interface.h"
                            , &c, 1) == 1) {
         if (c >= '0' && c <= '9') {
             input *= 10;
@@ -77050,9 +77095,9 @@ inline int InputInt(const std::string &message = "", const int max =
 
             if (input <= max) {
                 write(
-# 144 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 166 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
                      1
-# 144 "/home/grzegorz/HSE/TBCS/interface.h"
+# 166 "/home/grzegorz/HSE/TBCS/interface.h"
                                   , &c, 1);
             } else {
                 input /= 10;
@@ -77060,9 +77105,9 @@ inline int InputInt(const std::string &message = "", const int max =
         } else if (c == 127) {
             input /= 10;
             write(
-# 150 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 172 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
                  1
-# 150 "/home/grzegorz/HSE/TBCS/interface.h"
+# 172 "/home/grzegorz/HSE/TBCS/interface.h"
                               , "\b \b", 3);
         } else if (c == '\n' || c == '\r') {
             break;
@@ -77071,13 +77116,13 @@ inline int InputInt(const std::string &message = "", const int max =
 
     std::cout << '\n';
     tcsetattr(
-# 157 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 179 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
              0
-# 157 "/home/grzegorz/HSE/TBCS/interface.h"
+# 179 "/home/grzegorz/HSE/TBCS/interface.h"
                          , 
-# 157 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 179 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
                            0
-# 157 "/home/grzegorz/HSE/TBCS/interface.h"
+# 179 "/home/grzegorz/HSE/TBCS/interface.h"
                                   , &oldt);
 
     return static_cast<int>(input);
@@ -77098,32 +77143,32 @@ inline std::string Trim (std::string str) {
 
     return str;
 }
-# 204 "/home/grzegorz/HSE/TBCS/interface.h"
+# 227 "/home/grzegorz/HSE/TBCS/interface.h"
 inline std::string InputString (const std::string &message = "", const bool emptyAllowed = false) {
     termios oldt{}, newt{};
     tcgetattr(
-# 206 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 229 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
              0
-# 206 "/home/grzegorz/HSE/TBCS/interface.h"
+# 229 "/home/grzegorz/HSE/TBCS/interface.h"
                          , &oldt);
     newt = oldt;
     newt.c_lflag &= ~(
-# 208 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 231 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
                      0000002 
-# 208 "/home/grzegorz/HSE/TBCS/interface.h"
+# 231 "/home/grzegorz/HSE/TBCS/interface.h"
                             | 
-# 208 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 231 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
                               0000010
-# 208 "/home/grzegorz/HSE/TBCS/interface.h"
+# 231 "/home/grzegorz/HSE/TBCS/interface.h"
                                   );
     tcsetattr(
-# 209 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 232 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
              0
-# 209 "/home/grzegorz/HSE/TBCS/interface.h"
+# 232 "/home/grzegorz/HSE/TBCS/interface.h"
                          , 
-# 209 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 232 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
                            0
-# 209 "/home/grzegorz/HSE/TBCS/interface.h"
+# 232 "/home/grzegorz/HSE/TBCS/interface.h"
                                   , &newt);
 
     if (!message.empty()) {
@@ -77131,44 +77176,45 @@ inline std::string InputString (const std::string &message = "", const bool empt
     }
 
     std::string input;
-    char c;
+    char c = 0;
     while (c != '\n' || (Trim(input).empty() && !emptyAllowed)) {
         read(
-# 218 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 241 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
             0
-# 218 "/home/grzegorz/HSE/TBCS/interface.h"
+# 241 "/home/grzegorz/HSE/TBCS/interface.h"
                         , &c, 1);
         if (c == 127) {
             if (!input.empty()) {
                 input.pop_back();
+                input.pop_back();
                 write(
-# 222 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 246 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
                      1
-# 222 "/home/grzegorz/HSE/TBCS/interface.h"
+# 246 "/home/grzegorz/HSE/TBCS/interface.h"
                                   , "\b \b", 3);
             }
         } else if (c != '\n') {
             input += c;
             write(
-# 226 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 250 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
                  1
-# 226 "/home/grzegorz/HSE/TBCS/interface.h"
+# 250 "/home/grzegorz/HSE/TBCS/interface.h"
                               , &c, 1);
         }
     }
     write(
-# 229 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 253 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
          1
-# 229 "/home/grzegorz/HSE/TBCS/interface.h"
+# 253 "/home/grzegorz/HSE/TBCS/interface.h"
                       , "\n", 1);
     tcsetattr(
-# 230 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 254 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
              0
-# 230 "/home/grzegorz/HSE/TBCS/interface.h"
+# 254 "/home/grzegorz/HSE/TBCS/interface.h"
                          , 
-# 230 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
+# 254 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
                            0
-# 230 "/home/grzegorz/HSE/TBCS/interface.h"
+# 254 "/home/grzegorz/HSE/TBCS/interface.h"
                                   , &oldt);
 
     return input;
@@ -77260,8 +77306,8 @@ public:
     [[nodiscard]] std::string FindByName(const std::string &name, char split, int order = 0) const;
     [[nodiscard]] Node *FindByPrice(int price, int order = 0) const;
     [[nodiscard]] std::string FindByPrice (int price, char split, int order = 0) const;
-    [[nodiscard]] std::string Show () const;
-    static void Show(const Node *node, std::string &output, int depth = 0);
+    [[nodiscard]] std::string Show (bool byName = true) const;
+    static void Show(const Node *node, std::string &output, bool byName = true, int depth = 0);
 };
 
 BinaryTree::BinaryTree() {
@@ -77339,16 +77385,16 @@ std::string BinaryTree::FindByPrice(const int price, const char split, int order
     return temp != nullptr ? temp->ToString(split) : " ";
 }
 
-void BinaryTree::Show(const Node *node, std::string &output, const int depth) {
+void BinaryTree::Show(const Node *node, std::string &output, const bool byName, const int depth) {
     if (!node) return;
-    Show(node->pRightByName, output, depth + 1);
+    Show(byName ? node-> pRightByName : node->pRightByPrice, output, byName, depth + 1);
     output += std::string(depth * 20, ' ') + node->ToString() + "\n";
-    Show(node->pLeftByName, output, depth + 1);
+    Show(byName ? node->pLeftByName : node->pLeftByPrice, output, byName, depth + 1);
 }
 
-std::string BinaryTree::Show() const {
+std::string BinaryTree::Show(const bool byName) const {
     std::string output;
-    Show(pRootByName, output);
+    Show(byName ? pRootByName : pRootByPrice, output, byName);
     return output;
 }
 
@@ -77522,10 +77568,10 @@ std::string List::Show(const char split, const int order) const {
     const Node *pCurrent;
 
     switch (order) {
-        case 1:
+        case 0:
             pCurrent = pHeadByName;
             break;
-        case 2:
+        case 1:
             pCurrent = pHeadByPrice;
             break;
         default:
@@ -77537,8 +77583,8 @@ std::string List::Show(const char split, const int order) const {
 
     while (pCurrent != nullptr) {
         result += pCurrent->ToString() + split;
-        pCurrent = order == 1 ? pCurrent->pNextByName :
-                   order == 2 ? pCurrent->pNextByPrice :
+        pCurrent = order == 0 ? pCurrent->pNextByName :
+                   order == 1 ? pCurrent->pNextByPrice :
                    pCurrent->pNextByInput;
     }
 
@@ -77564,7 +77610,7 @@ void inputPush (BinaryTree *tree, List *listC, int count = 20) {
     while (count-- > 0) {
         temp.name = InputString("Введите название (Чтобы закончить, нажмите Enter, ничего не вводя.):", true);
 
-        if (temp.name.empty())
+        if (Trim(temp.name).empty())
             break;
 
         temp.origin = InputString("Введите страну происхождения:");
@@ -77577,18 +77623,30 @@ void inputPush (BinaryTree *tree, List *listC, int count = 20) {
 
 
 int main() {
+
+
+
+
+    std::cout << "\x1B[41mВНИМАНИЕ!!!\nСправка.\033[0m\n"
+                 "Рекомендуется открыть программу в отдельном терминале, а не в терминале IDE.\n"
+                 "Для перемещения между кнопками меню использовать стрелки вверх и вниз, либо кнопки W и S.\n"
+                 "Для выбора пункта меню использовать Enter или кнопку E.\n"
+                 "Если кнопки не работают, попробуйте переключить язык на английский и отключить Caps Lock.\n"
+                 "Если и это не сработает, поставьте Linux. Именно под него писалась прога. Там всё работает.\n\n"
+                 "Нажимая на любую кнопку, вы передаёте мне все сохранённые на устройстве пароли и персональные данные и соглашаетесь на их обработку. (или нет) . . .";
+    Pause();
     BinaryTree coffeeTree;
     List coffeeList;
     int count = 20;
     char yesNoOptions[2][1024] = {"Да", "Нет"};
 
     if (Menu (yesNoOptions, 2, const_cast<char *>("Загрузить данные из шаблона?")) == 0) {
-        push(&coffeeTree, &coffeeList, CoffeeVariety("Иргачиф", "Эфиопия", "Светлая", 50, 46));
-        push(&coffeeTree, &coffeeList, CoffeeVariety("Супремо", "Колумбия", "Средняя", 60, 30));
-        push(&coffeeTree, &coffeeList, CoffeeVariety("Сантос", "Бразилия", "Средняя", 60, 28));
-        push(&coffeeTree, &coffeeList, CoffeeVariety("Малабарский муссон", "Индия", "Тёмная", 70, 29));
-        push(&coffeeTree, &coffeeList, CoffeeVariety("Антигуа", "Гватемала", "Светлая", 50, 35));
-        push(&coffeeTree, &coffeeList, CoffeeVariety("Тарразу", "Коста Рика", "Средняя", 60, 38));
+        push(&coffeeTree, &coffeeList, CoffeeVariety{"Иргачиф", "Эфиопия", "Светлая", 50, 46});
+        push(&coffeeTree, &coffeeList, CoffeeVariety{"Супремо", "Колумбия", "Средняя", 60, 30});
+        push(&coffeeTree, &coffeeList, CoffeeVariety{"Сантос", "Бразилия", "Средняя", 60, 28});
+        push(&coffeeTree, &coffeeList, CoffeeVariety{"Малабарский муссон", "Индия", "Тёмная", 70, 29});
+        push(&coffeeTree, &coffeeList, CoffeeVariety{"Антигуа", "Гватемала", "Светлая", 50, 35});
+        push(&coffeeTree, &coffeeList, CoffeeVariety{"Тарразу", "Коста Рика", "Средняя", 60, 38});
         std::cout << "Загружено:\n" << coffeeList.Show() << '\n';
         count -= 6;
     }
@@ -77600,7 +77658,7 @@ int main() {
 
     while (isRunning) {
         char options[][1024] = {"Показать список", "Найти по названию", "Найти по цене", "Показать дерево", "Выйти"};
-        char sortOptions[][1024] = {"По порядку добавления", "По названию", "По цене"};
+        char sortOptions[][1024] = {"По названию", "По цене", "По порядку добавления"};
         switch (Menu(options, 5, const_cast<char *>("Выберите действие:"), content)) {
             case 0: {
                 content = coffeeList.Show('\n', Menu (sortOptions, 3, const_cast<char *>("Выберите порядок:"), content));
@@ -77610,14 +77668,16 @@ int main() {
                 std::string searchName = InputString("Введите название:");
                 int order = 0;
                 content = "";
+                std::string coffeeString = coffeeList.FindByName(searchName, ' ', order);
 
-                if (std::string coffeeString = coffeeList.FindByName(searchName, ' ', order); coffeeString.empty())
+                if (coffeeString.empty())
                     content = "Такого элемента нет.";
                 else {
+                    coffeeString = "1. " + coffeeString;
                     content += coffeeString + '\n';
 
                     while (!coffeeString.empty()) {
-                        coffeeString = coffeeList.FindByName(searchName, ' ', ++order);
+                        coffeeString = static_cast<char>(order + 1) + ". " + coffeeList.FindByName(searchName, ' ', ++order);
                         content += coffeeString + '\n';
                     }
                 }
@@ -77627,8 +77687,9 @@ int main() {
                 int searchPrice = InputInt("Введите цену:");
                 int order = 0;
                 content = "";
+                std::string coffeeString = coffeeList.FindByPrice(searchPrice, ' ', order);
 
-                if (std::string coffeeString = coffeeList.FindByPrice(searchPrice, ' ', order); coffeeString.empty())
+                if (coffeeString.empty())
                     content = "Такого элемента нет.";
                 else {
                     content += coffeeString + '\n';
@@ -77641,7 +77702,7 @@ int main() {
                 break;
             }
             case 3: {
-                content = coffeeTree.Show();
+                content = coffeeTree.Show(Menu (sortOptions, 2, const_cast<char *>("Выберите порядок:"), content) == 0);
                 break;
             }
             default: {
