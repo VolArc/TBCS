@@ -1,6 +1,6 @@
 CMakeFiles/TBCS.dir/main.cpp.o.ddi: /home/grzegorz/HSE/TBCS/main.cpp \
- /usr/include/stdc-predef.h /usr/include/c++/14/cstring \
- /usr/include/c++/14/bits/version.h \
+ /usr/include/stdc-predef.h /usr/include/c++/14/iostream \
+ /usr/include/c++/14/bits/requires_hosted.h \
  /usr/include/c++/14/x86_64-redhat-linux/bits/c++config.h \
  /usr/include/bits/wordsize.h \
  /usr/include/c++/14/x86_64-redhat-linux/bits/os_defines.h \
@@ -9,23 +9,21 @@ CMakeFiles/TBCS.dir/main.cpp.o.ddi: /home/grzegorz/HSE/TBCS/main.cpp \
  /usr/include/bits/long-double.h /usr/include/gnu/stubs.h \
  /usr/include/gnu/stubs-64.h \
  /usr/include/c++/14/x86_64-redhat-linux/bits/cpu_defines.h \
- /usr/include/c++/14/pstl/pstl_config.h /usr/include/string.h \
- /usr/include/bits/libc-header-start.h \
- /usr/lib/gcc/x86_64-redhat-linux/14/include/stddef.h \
- /usr/include/bits/types/locale_t.h /usr/include/bits/types/__locale_t.h \
- /usr/include/strings.h /usr/include/c++/14/iostream \
- /usr/include/c++/14/bits/requires_hosted.h /usr/include/c++/14/ostream \
+ /usr/include/c++/14/pstl/pstl_config.h /usr/include/c++/14/ostream \
  /usr/include/c++/14/ios /usr/include/c++/14/iosfwd \
  /usr/include/c++/14/bits/stringfwd.h \
  /usr/include/c++/14/bits/memoryfwd.h /usr/include/c++/14/bits/postypes.h \
  /usr/include/c++/14/cwchar /usr/include/wchar.h \
- /usr/include/bits/floatn.h /usr/include/bits/floatn-common.h \
+ /usr/include/bits/libc-header-start.h /usr/include/bits/floatn.h \
+ /usr/include/bits/floatn-common.h \
+ /usr/lib/gcc/x86_64-redhat-linux/14/include/stddef.h \
  /usr/lib/gcc/x86_64-redhat-linux/14/include/stdarg.h \
  /usr/include/bits/wchar.h /usr/include/bits/types/wint_t.h \
  /usr/include/bits/types/mbstate_t.h \
  /usr/include/bits/types/__mbstate_t.h /usr/include/bits/types/__FILE.h \
- /usr/include/bits/types/FILE.h /usr/include/c++/14/exception \
- /usr/include/c++/14/bits/exception.h \
+ /usr/include/bits/types/FILE.h /usr/include/bits/types/locale_t.h \
+ /usr/include/bits/types/__locale_t.h /usr/include/c++/14/exception \
+ /usr/include/c++/14/bits/exception.h /usr/include/c++/14/bits/version.h \
  /usr/include/c++/14/bits/exception_ptr.h \
  /usr/include/c++/14/bits/exception_defines.h \
  /usr/include/c++/14/bits/cxxabi_init_exception.h \
@@ -153,10 +151,7 @@ CMakeFiles/TBCS.dir/main.cpp.o.ddi: /home/grzegorz/HSE/TBCS/main.cpp \
  /usr/include/c++/14/bits/parse_numbers.h \
  /usr/include/c++/14/bits/ranges_algobase.h \
  /usr/include/c++/14/bits/ostream.tcc /usr/include/c++/14/istream \
- /usr/include/c++/14/bits/istream.tcc /usr/include/c++/14/stack \
- /usr/include/c++/14/deque /usr/include/c++/14/bits/stl_uninitialized.h \
- /usr/include/c++/14/bits/stl_deque.h /usr/include/c++/14/bits/deque.tcc \
- /usr/include/c++/14/bits/stl_stack.h /home/grzegorz/HSE/TBCS/interface.h \
+ /usr/include/c++/14/bits/istream.tcc /home/grzegorz/HSE/TBCS/interface.h \
  /usr/include/unistd.h /usr/include/bits/posix_opt.h \
  /usr/include/bits/environments.h /usr/include/bits/confname.h \
  /usr/include/bits/getopt_posix.h /usr/include/bits/getopt_core.h \
@@ -166,4 +161,9 @@ CMakeFiles/TBCS.dir/main.cpp.o.ddi: /home/grzegorz/HSE/TBCS/main.cpp \
  /usr/include/bits/termios-c_iflag.h /usr/include/bits/termios-c_oflag.h \
  /usr/include/bits/termios-baud.h /usr/include/bits/termios-c_cflag.h \
  /usr/include/bits/termios-c_lflag.h /usr/include/bits/termios-tcflow.h \
- /usr/include/bits/termios-misc.h /usr/include/sys/ttydefaults.h
+ /usr/include/bits/termios-misc.h /usr/include/sys/ttydefaults.h \
+ /home/grzegorz/HSE/TBCS/BinaryTree.h /usr/include/c++/14/cstring \
+ /usr/include/string.h /usr/include/strings.h /usr/include/c++/14/stack \
+ /usr/include/c++/14/deque /usr/include/c++/14/bits/stl_uninitialized.h \
+ /usr/include/c++/14/bits/stl_deque.h /usr/include/c++/14/bits/deque.tcc \
+ /usr/include/c++/14/bits/stl_stack.h /home/grzegorz/HSE/TBCS/List.h

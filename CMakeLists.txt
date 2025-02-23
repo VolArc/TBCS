@@ -4,4 +4,6 @@ project(TBCS)
 set(CMAKE_CXX_STANDARD 26)
 
 add_executable(TBCS main.cpp
-        interface.h)
+        interface.h
+        BinaryTree.h
+        List.h)
