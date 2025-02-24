@@ -166,4 +166,5 @@ CMakeFiles/TBCS.dir/main.cpp.o.ddi: /home/grzegorz/HSE/TBCS/main.cpp \
  /usr/include/string.h /usr/include/strings.h /usr/include/c++/14/stack \
  /usr/include/c++/14/deque /usr/include/c++/14/bits/stl_uninitialized.h \
  /usr/include/c++/14/bits/stl_deque.h /usr/include/c++/14/bits/deque.tcc \
- /usr/include/c++/14/bits/stl_stack.h /home/grzegorz/HSE/TBCS/List.h
+ /usr/include/c++/14/bits/stl_stack.h /home/grzegorz/HSE/TBCS/List.h \
+ /home/grzegorz/HSE/TBCS/Array.h

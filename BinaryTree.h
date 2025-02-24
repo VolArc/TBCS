@@ -5,6 +5,8 @@
 #include <iostream>
 #include <stack>
 
+#include "List.h"
+
 
 class BinaryTree {
 
@@ -25,8 +27,9 @@ class BinaryTree {
 
     CoffeeVariety *dataArr = {};
     int arrLength = 0;
+    int empty = 0;
 
-
+public:
     class Node {
     public:
         Node *pLeftByName;
@@ -56,25 +59,29 @@ class BinaryTree {
     Node *pRootByName;
     Node *pRootByPrice;
 
-public:
     BinaryTree();
     ~BinaryTree();
 
     void push (const std::string &name, const std::string &origin, const std::string &roast, const int caffeine, const int price) {
-        //if (this->FindByName(name) != nullptr)
-        //    throw DuplicateException();
-        //if (this->FindByPrice(price) != nullptr)
-        //    throw DuplicateException();
+        if (this->FindByName(name) != nullptr || this->FindByPrice(price) != nullptr) throw DuplicateException();
 
+        int j = -1;
+        while (++j < arrLength && dataArr[j].price != -1)
+            ;
         const auto pTemp = new Node(name, price, arrLength);
-        auto *tempArr = new CoffeeVariety[arrLength+1];
 
-        for (int i = 0; i < arrLength; i++) {
-            tempArr[i] = dataArr[i];
+        if (j == arrLength) {
+            auto *tempArr = new CoffeeVariety[arrLength+1];
+
+            for (int i = 0; i < arrLength; i++) tempArr[i] = dataArr[i];
+
+            tempArr[arrLength++] = {name, origin, roast, caffeine, price};
+            dataArr = tempArr;
         }
-
-        tempArr[arrLength++] = {name, origin, roast, caffeine, price};
-        dataArr = tempArr;
+        else {
+            pTemp->index = j;
+            dataArr[j] = {name, origin, roast, caffeine, price};
+        }
 
         if (pRootByName == nullptr) {
             pRootByName = pTemp;
@@ -116,12 +123,26 @@ public:
         }
     }
 
-    [[nodiscard]] Node *FindByName(const std::string &name, int order = 0) const;
-    [[nodiscard]] std::string FindByName(const std::string &name, char split, int order = 0) const;
-    [[nodiscard]] Node *FindByPrice(int price, int order = 0) const;
-    [[nodiscard]] std::string FindByPrice (int price, char split, int order = 0) const;
+private:
+    static Node* ToTree(Node** nodes, int start, int end, bool byName = true);
+    static void ToArray(Node* node, Node** nodes, int& index, bool byName = true);
+public:
+    void balanceTree(bool byName = true);
+    [[nodiscard]] Node *FindByName(const std::string &name) const;
+    [[nodiscard]] std::string FindByName(const std::string &name, char split, bool recursive) const;
+    [[nodiscard]] Node *FindByPrice(int price) const;
+    [[nodiscard]] std::string FindByPrice (int price, char split, bool recursive) const;
     [[nodiscard]] std::string Show (bool byName = true) const;
     static void Show(const Node *node, std::string &output, CoffeeVariety *dataArr, bool byName = true, int depth = 0);
+    [[nodiscard]] std::string ToString (bool byName = true, bool reverse = false) const;
+    static void ToString (const Node *node, std::string &output, CoffeeVariety *dataArr, bool byName = true, bool reverse = false);
+    bool Remove (const std::string &name);
+    bool Remove (int price);
+    void Remove (Node *parent, const Node *target, bool byName);
+
+    static Node* FindByNameRecursive(Node* node, const std::string &name);
+
+    static Node* FindByPriceRecursive(Node* node, int price);
 };
 
 inline BinaryTree::BinaryTree() {
@@ -147,63 +168,81 @@ inline BinaryTree::~BinaryTree() {
     }
 
     pRootByName = nullptr;
+    delete [] dataArr;
 }
 
-inline BinaryTree::Node *BinaryTree::FindByName(const std::string &name, int order) const {
+inline BinaryTree::Node *BinaryTree::FindByName(const std::string &name) const {
     Node *pCurrent = pRootByName;
 
-    while (strcmp(name.c_str(), pCurrent->name.c_str()) != 0 || order > -1) {
+    if (!pCurrent) return nullptr;
+
+    while (strcmp(name.c_str(), pCurrent->name.c_str()) != 0) {
         if (strcmp(name.c_str(), pCurrent->name.c_str()) < 0) {
             if (pCurrent->pLeftByName == nullptr)
                 return nullptr;
             pCurrent = pCurrent->pLeftByName;
         }
-        else if (strcmp(name.c_str(), pCurrent->name.c_str()) > 0 || order > 0) {
+        else if (strcmp(name.c_str(), pCurrent->name.c_str()) > 0) {
             if (pCurrent->pRightByName == nullptr)
                 return nullptr;
             pCurrent = pCurrent->pRightByName;
         }
-        else order--;
     }
 
     return pCurrent;
 }
 
-inline std::string BinaryTree::FindByName(const std::string &name, const char split, const int order) const {
-    const Node *temp = FindByName(name, order);
+inline std::string BinaryTree::FindByName(const std::string &name, const char split, const bool recursive) const {
+    const Node *temp = recursive ? FindByNameRecursive(pRootByName, name) : FindByName(name);
     return temp != nullptr ? temp->ToString(dataArr[temp->index], split) : " ";
 }
 
 
-inline BinaryTree::Node *BinaryTree::FindByPrice(const int price, int order) const {
+inline BinaryTree::Node *BinaryTree::FindByPrice(const int price) const {
     Node *pCurrent = pRootByPrice;
 
-    while (price != pCurrent->price || order > -1) {
+    if (!pCurrent) return nullptr;
+
+    while (price != pCurrent->price) {
         if (price < pCurrent->price) {
             if (pCurrent->pLeftByPrice == nullptr)
                 return nullptr;
             pCurrent = pCurrent->pLeftByPrice;
         }
-        else if (price > pCurrent->price || order > 0) {
+        else if (price > pCurrent->price) {
             if (pCurrent->pRightByPrice == nullptr)
                 return nullptr;
             pCurrent = pCurrent->pRightByPrice;
         }
-        else order--;
     }
 
     return pCurrent;
 }
 
-inline std::string BinaryTree::FindByPrice(const int price, const char split, int order) const {
-    const Node *temp = FindByPrice(price, order);
+inline std::string BinaryTree::FindByPrice(const int price, const char split, const bool recursive) const {
+    const Node *temp = recursive ? FindByPriceRecursive(pRootByPrice, price) : FindByPrice(price);
     return temp != nullptr ? temp->ToString(dataArr[temp->index], split) : " ";
 }
+
+inline BinaryTree::Node* BinaryTree::FindByNameRecursive(Node* node, const std::string &name) {
+    if (!node || node->name == name) return node;
+    if (name < node->name)
+        return FindByNameRecursive(node->pLeftByName, name);
+    return FindByNameRecursive(node->pRightByName, name);
+}
+
+inline BinaryTree::Node* BinaryTree::FindByPriceRecursive(Node* node, const int price) {
+    if (!node || node->price == price) return node;
+    if (price < node->price)
+        return FindByPriceRecursive(node->pLeftByPrice, price);
+    return FindByPriceRecursive(node->pRightByPrice, price);
+}
+
 
 inline void BinaryTree::Show(const Node *node, std::string &output, CoffeeVariety *dataArr, bool byName, int depth ) {
     if (!node) return;
     Show(byName ? node-> pRightByName : node->pRightByPrice, output, dataArr, byName, depth + 1);
-    output += std::string(depth * 20, ' ') + node->ToString(dataArr[node->index]) + "\n";
+    output += std::string(depth * 20, ' ') + '|' + node->ToString(dataArr[node->index]) + "\n";
     Show(byName ? node->pLeftByName : node->pLeftByPrice, output, dataArr, byName, depth + 1);
 }
 
@@ -212,5 +251,146 @@ inline std::string BinaryTree::Show(const bool byName) const {
     Show(byName ? pRootByName : pRootByPrice, output, dataArr, byName);
     return output;
 }
+
+inline void BinaryTree::balanceTree(bool byName) {
+    int count = 0;
+    ToArray(byName ? pRootByName : pRootByPrice, nullptr, count);
+    const auto nodes = new Node*[count];
+    int index = 0;
+    ToArray(byName ? pRootByName : pRootByPrice, nodes, index);
+    byName ? pRootByName : pRootByPrice = ToTree(nodes, 0, count - 1);
+    delete[] nodes;
+}
+
+
+inline BinaryTree::Node* BinaryTree::ToTree(Node** nodes, const int start, const int end, bool byName) {
+    if (start > end) return nullptr;
+    const int mid = (start + end) / 2;
+    Node* node = nodes[mid];
+    byName ? node->pLeftByName : node->pLeftByPrice = ToTree(nodes, start, mid - 1);
+    byName ? node->pRightByName : node->pRightByPrice = ToTree(nodes, mid + 1, end);
+    return node;
+}
+
+inline void BinaryTree::ToArray(Node* node, Node** nodes, int& index, bool byName) {
+    if (!node) return;
+    ToArray(byName ? node->pLeftByName : node->pLeftByPrice, nodes, index);
+    if (nodes) nodes[index] = node;
+    index++;
+    ToArray(byName ? node->pRightByName : node->pRightByPrice, nodes, index);
+}
+
+inline std::string BinaryTree::ToString(const bool byName, const bool reverse) const {
+    std::string output;
+    ToString(byName ? pRootByName : pRootByPrice, output, dataArr, byName, reverse);
+    return output;
+}
+
+inline void BinaryTree::ToString(const Node *node, std::string &output, CoffeeVariety *dataArr, const bool byName, const bool reverse) {
+    if (!node) return;
+    ToString(byName ? node->pLeftByName : node->pLeftByPrice, output, dataArr, byName, reverse);
+    if (!reverse) output += node->ToString(dataArr[node->index]) + '\n';
+    else output = node->ToString(dataArr[node->index]) + '\n' + output;
+    ToString(byName ? node->pRightByName : node->pRightByPrice, output, dataArr, byName, reverse);
+}
+
+inline bool BinaryTree::Remove(const std::string &name) {
+    Node *parentByName = nullptr;
+    Node *parentByPrice = nullptr;
+    Node *current = pRootByName;
+
+    while (current != nullptr && current->name != name) {
+        parentByName = current;
+        if (name < current->name) current = current->pLeftByName;
+        else  current = current->pRightByName;
+    }
+
+    if (current == nullptr) return false;
+
+    parentByPrice = nullptr;
+    Node *currentByPrice = pRootByPrice;
+    while (currentByPrice != nullptr && currentByPrice != current) {
+        parentByPrice = currentByPrice;
+        if (current->price < currentByPrice->price)
+            currentByPrice = currentByPrice->pLeftByPrice;
+        else
+            currentByPrice = currentByPrice->pRightByPrice;
+    }
+
+    Remove(parentByName, current, true);
+    Remove(parentByPrice, current, false);
+
+    delete current;
+
+    return true;
+}
+
+inline bool BinaryTree::Remove(const int price) {
+    Node *parentByPrice = nullptr;
+    Node *parentByName = nullptr;
+    Node *current = pRootByPrice;
+
+    while (current != nullptr && current->price != price) {
+        parentByPrice = current;
+        if (price < current->price)
+            current = current->pLeftByPrice;
+        else
+            current = current->pRightByPrice;
+    }
+
+    if (current == nullptr) return false;
+
+    parentByName = nullptr;
+    Node *currentByName = pRootByName;
+    while (currentByName != nullptr && currentByName != current) {
+        parentByName = currentByName;
+        if (current->name < currentByName->name)
+            currentByName = currentByName->pLeftByName;
+        else
+            currentByName = currentByName->pRightByName;
+    }
+
+    Remove(parentByName, current, true);
+    Remove(parentByPrice, current, false);
+
+    delete current;
+
+    return true;
+}
+
+inline void BinaryTree::Remove(Node *parent, const Node *target, const bool byName) {
+    Node *child = (byName ? target->pLeftByName : target->pLeftByPrice) ?
+                  (byName ? target->pLeftByName : target->pLeftByPrice) :
+                  (byName ? target->pRightByName : target->pRightByPrice);
+
+    const int index = target->index;
+    dataArr[index].name = "";
+    dataArr[index].caffeine = -1;
+    dataArr[index].origin = "";
+    dataArr[index].price = -1;
+    dataArr[index].roast = "";
+    empty++;
+
+    if (parent == nullptr) {
+        if (byName)
+            pRootByName = child;
+        else
+            pRootByPrice = child;
+    } else {
+        if (byName) {
+            if (parent->pLeftByName == target)
+                parent->pLeftByName = child;
+            else
+                parent->pRightByName = child;
+        } else {
+            if (parent->pLeftByPrice == target)
+                parent->pLeftByPrice = child;
+            else
+                parent->pRightByPrice = child;
+        }
+    }
+}
+
+
 
 #endif

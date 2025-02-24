@@ -6,7 +6,6 @@
 
 
 class List {
-
     class DuplicateException {
     public:
         DuplicateException () {
@@ -21,7 +20,6 @@ class List {
         int caffeine{};
         int price{};
     };
-
     CoffeeVariety *dataArr = {};
     int arrLength = 0;
 
@@ -30,10 +28,7 @@ public:
     ~List();
 
     void push (const std::string &name, const std::string &origin, const std::string &roast, const int caffeine, const int price) {
-        //if (this->FindByName(name) != nullptr)
-        //    throw DuplicateException();
-        //if (this->FindByPrice(price) != nullptr)
-        //    throw DuplicateException();
+        if (this->FindByName(name) != nullptr || this->FindByPrice(price) != nullptr) throw DuplicateException();
 
         const auto pTemp = new Node(name, price, arrLength);
         auto *tempArr = new CoffeeVariety[arrLength+1];
@@ -90,7 +85,6 @@ public:
         }
     }
 
-private:
     class Node {
     public:
         Node *pNextByName;
@@ -119,12 +113,15 @@ private:
     Node *pHeadByPrice;
     Node *pHeadByInput;
 
-public:
-    [[nodiscard]] Node *FindByName(const std::string &name, int order = 0) const;
-    [[nodiscard]] std::string FindByName (const std::string &name, char split, int order = 0) const;
-    [[nodiscard]] Node *FindByPrice (int price, int order = 0) const;
-    [[nodiscard]] std::string FindByPrice (int price, char split, int order = 0) const;
-    [[nodiscard]] std::string Show (char split = '\n', int order = 0) const;
+    [[nodiscard]] Node *FindByName(const std::string &name) const;
+    [[nodiscard]] std::string FindByName (const std::string &name, char split, bool recursive) const;
+    [[nodiscard]] Node *FindByPrice (int price) const;
+    [[nodiscard]] std::string FindByPrice (int price, char split, bool recursive) const;
+    [[nodiscard]] std::string Show (char split = '\n', int order = 0, bool reverse = false) const;
+    [[nodiscard]] bool Remove(const std::string &name);
+    [[nodiscard]] bool Remove (int price);
+    static Node *FindByNameRecursive(Node *node, const std::string &name);
+    static Node *FindByPriceRecursive(Node *node, int price);
 };
 
 inline List::List() {
@@ -141,71 +138,62 @@ inline List::~List() {
     }
 }
 
-inline List::Node *List::FindByName(const std::string &name, int order) const {
+inline List::Node *List::FindByName(const std::string &name) const {
     Node *pCurrent = pHeadByName;
 
-    while (order > -1) {
+    if (!pCurrent) return nullptr;
         while (strcmp (name.c_str(), pCurrent->name.c_str()) > 0) {
             if (pCurrent->pNextByName == nullptr)
                 return nullptr;
             pCurrent = pCurrent->pNextByName;
         }
 
-        if (strcmp (name.c_str(), pCurrent->name.c_str()) < 0)
-            break;
-
-        if (strcmp (name.c_str(), pCurrent->name.c_str()) == 0) {
-            if (order-- == 0)
-                return pCurrent;
-
-            if (pCurrent->pNextByName == nullptr)
-                return nullptr;
-            pCurrent = pCurrent->pNextByName;
-        }
-    }
+        if (strcmp (name.c_str(), pCurrent->name.c_str()) == 0)
+            return pCurrent;
 
     return nullptr;
 }
 
-inline std::string List::FindByName(const std::string &name, const char split, const int order) const {
-    const Node *temp = this->FindByName(name, order);
+inline std::string List::FindByName(const std::string &name, const char split, const bool recursive) const {
+    const Node *temp = recursive ? FindByNameRecursive(pHeadByName, name) : this->FindByName(name);
     return temp != nullptr ? temp->ToString(dataArr[temp->index], split) : "";
 }
 
 
-inline List::Node *List::FindByPrice(const int price, int order) const {
+inline List::Node *List::FindByPrice(const int price) const {
     Node *pCurrent = pHeadByPrice;
 
-    while (order > -1) {
-        while (price > pCurrent->price) {
-            if (pCurrent->pNextByPrice == nullptr)
-                return nullptr;
-            pCurrent = pCurrent->pNextByPrice;
-        }
-
-        if (price < pCurrent->price)
-            break;
-
-        if (price == pCurrent->price) {
-            if (order-- == 0)
-                return pCurrent;
-
-            if (pCurrent->pNextByPrice != nullptr)
-                pCurrent = pCurrent->pNextByPrice;
-            else
-                return nullptr;
-        }
+    if (!pCurrent) return nullptr;
+    while (price > pCurrent->price) {
+        if (pCurrent->pNextByName == nullptr)
+            return nullptr;
+        pCurrent = pCurrent->pNextByName;
     }
+
+    if (price == pCurrent->price)
+        return pCurrent;
 
     return nullptr;
 }
 
-inline std::string List::FindByPrice(const int price, const char split, const int order) const {
-    const Node *temp = this->FindByPrice(price, order);
+inline std::string List::FindByPrice(const int price, const char split, const bool recursive) const {
+    const Node *temp = recursive ? FindByPriceRecursive(pHeadByPrice, price) : this->FindByPrice(price);
     return temp != nullptr ? temp->ToString(dataArr[temp->index], split) : "";
 }
 
-inline std::string List::Show(const char split, const int order) const {
+inline List::Node *List::FindByNameRecursive(Node *node, const std::string &name) {
+    if (!node || strcmp(name.c_str(), node->name.c_str()) <= 0)
+        return (node && strcmp(name.c_str(), node->name.c_str()) == 0) ? node : nullptr;
+    return FindByNameRecursive(node->pNextByName, name);
+}
+
+inline List::Node *List::FindByPriceRecursive(Node *node, const int price) {
+    if (!node || price <= node->price)
+        return (node && price == node->price) ? node : nullptr;
+    return FindByPriceRecursive(node->pNextByPrice, price);
+}
+
+inline std::string List::Show(const char split, const int order, const bool reverse) const {
     const Node *pCurrent;
 
     switch (order) {
@@ -220,18 +208,104 @@ inline std::string List::Show(const char split, const int order) const {
             break;
     }
 
-    std::string result;
+    std::string output;
 
     while (pCurrent != nullptr) {
-        result += pCurrent->ToString(dataArr[pCurrent->index]) + split;
+        std::string result = pCurrent->ToString(dataArr[pCurrent->index]);
         pCurrent = order == 0 ? pCurrent->pNextByName :
                    order == 1 ? pCurrent->pNextByPrice :
                    pCurrent->pNextByInput;
+
+        if (!reverse) output += result + split;
+        else output = result + split + output;
     }
 
-    return result;
+    return output;
 }
 
+inline bool List::Remove(const std::string &name) {
+    if (!pHeadByName) return false;
 
+    Node *pPrev = nullptr;
+    Node *pCurrent = pHeadByName;
+
+    while (pCurrent && strcmp(name.c_str(), pCurrent->name.c_str()) > 0) {
+        pPrev = pCurrent;
+        pCurrent = pCurrent->pNextByName;
+    }
+
+    if (!pCurrent || strcmp(name.c_str(), pCurrent->name.c_str()) != 0) {
+        return false;
+    }
+
+    if (pPrev) {
+        pPrev->pNextByName = pCurrent->pNextByName;
+    } else {
+        pHeadByName = pCurrent->pNextByName;
+    }
+
+    Node *pPrevPrice = nullptr, *pCurrentPrice = pHeadByPrice;
+    while (pCurrentPrice && pCurrentPrice != pCurrent) {
+        pPrevPrice = pCurrentPrice;
+        pCurrentPrice = pCurrentPrice->pNextByPrice;
+    }
+
+    if (pCurrentPrice) {
+        if (pPrevPrice) {
+            pPrevPrice->pNextByPrice = pCurrentPrice->pNextByPrice;
+        } else {
+            pHeadByPrice = pCurrentPrice->pNextByPrice;
+        }
+    }
+
+    Node *pPrevInput = nullptr, *pCurrentInput = pHeadByInput;
+    while (pCurrentInput && pCurrentInput != pCurrent) {
+        pPrevInput = pCurrentInput;
+        pCurrentInput = pCurrentInput->pNextByInput;
+    }
+
+    if (pCurrentInput) {
+        if (pPrevInput) {
+            pPrevInput->pNextByInput = pCurrentInput->pNextByInput;
+        } else {
+            pHeadByInput = pCurrentInput->pNextByInput;
+        }
+    }
+
+    auto *tempArr = new CoffeeVariety[arrLength - 1];
+    for (int i = 0, j = 0; i < arrLength; ++i) {
+        if (i != pCurrent->index) {
+            tempArr[j++] = dataArr[i];
+        }
+    }
+
+    delete[] dataArr;
+    dataArr = tempArr;
+    arrLength--;
+
+    Node *pUpdate = pHeadByInput;
+    int newIndex = 0;
+    while (pUpdate) {
+        pUpdate->index = newIndex++;
+        pUpdate = pUpdate->pNextByInput;
+    }
+
+    delete pCurrent;
+    return true;
+}
+
+inline bool List::Remove(const int price) {
+    if (!pHeadByPrice) return false;
+
+    Node *pCurrent = pHeadByPrice;
+
+    while (pCurrent && price > pCurrent->price)
+        pCurrent = pCurrent->pNextByPrice;
+
+    if (!pCurrent || price != pCurrent->price)
+        return false;
+
+    return Remove(pCurrent->name);
+}
 
 #endif

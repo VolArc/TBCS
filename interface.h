@@ -197,63 +197,16 @@ inline std::string Trim (std::string str) {
     return str;
 }
 
-
-#ifdef _WIN32
-inline std::string InputString(const std::string &message = "", const bool emptyAllowed = false) {
-    if (!message.empty()) {
-        std::cout << '\n' << message << '\n';
-    }
-
-    std::string input;
-    char c;
-    while (c != '\r' || (Trim(input).empty() && !emptyAllowed)) {
-        c = GETCHAR;
-        if (c == 8) {
-            if (!input.empty()) {
-                input.pop_back();
-                input.pop_back();
-                std::cout << "\b \b";
-            }
-        } else if (c != '\r') {
-            input += c;
-            std::cout << c;
-        }
-    }
-    std::cout << '\n';
-
-    return input;
-}
-#else
 inline std::string InputString (const std::string &message = "", const bool emptyAllowed = false) {
-    termios oldt{}, newt{};
-    tcgetattr(STDIN_FILENO, &oldt);
-    newt = oldt;
-    newt.c_lflag &= ~(ICANON | ECHO);
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-
-    if (!message.empty()) {
-        std::cout << message << '\n';
-    }
-
     std::string input;
-    char c = 0;
-    while (c != '\n' || (Trim(input).empty() && !emptyAllowed)) {
-        read(STDIN_FILENO, &c, 1);
-        if (c == 127) {
-            if (!input.empty()) {
-                input.pop_back();
-                input.pop_back();
-                write(STDOUT_FILENO, "\b \b", 3);
-            }
-        } else if (c != '\n') {
-            input += c;
-            write(STDOUT_FILENO, &c, 1);
+
+    do {
+        if (!message.empty()) {
+            std::cout << '\n' << message << ' ';
         }
-    }
-    write(STDOUT_FILENO, "\n", 1);
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+        std::getline(std::cin, input);
+    } while (Trim(input).empty() && !emptyAllowed);
 
     return input;
 }
-#endif
 #endif

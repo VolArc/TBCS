@@ -70792,6 +70792,7 @@ namespace std __attribute__ ((__visibility__ ("default")))
 
 }
 # 2 "/home/grzegorz/HSE/TBCS/main.cpp" 2
+
 # 1 "/home/grzegorz/HSE/TBCS/interface.h" 1
 
 
@@ -72558,83 +72559,20 @@ inline std::string Trim (std::string str) {
 
     return str;
 }
-# 227 "/home/grzegorz/HSE/TBCS/interface.h"
+
 inline std::string InputString (const std::string &message = "", const bool emptyAllowed = false) {
-    termios oldt{}, newt{};
-    tcgetattr(
-# 229 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
-             0
-# 229 "/home/grzegorz/HSE/TBCS/interface.h"
-                         , &oldt);
-    newt = oldt;
-    newt.c_lflag &= ~(
-# 231 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
-                     0000002 
-# 231 "/home/grzegorz/HSE/TBCS/interface.h"
-                            | 
-# 231 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
-                              0000010
-# 231 "/home/grzegorz/HSE/TBCS/interface.h"
-                                  );
-    tcsetattr(
-# 232 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
-             0
-# 232 "/home/grzegorz/HSE/TBCS/interface.h"
-                         , 
-# 232 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
-                           0
-# 232 "/home/grzegorz/HSE/TBCS/interface.h"
-                                  , &newt);
-
-    if (!message.empty()) {
-        std::cout << message << '\n';
-    }
-
     std::string input;
-    char c = 0;
-    while (c != '\n' || (Trim(input).empty() && !emptyAllowed)) {
-        read(
-# 241 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
-            0
-# 241 "/home/grzegorz/HSE/TBCS/interface.h"
-                        , &c, 1);
-        if (c == 127) {
-            if (!input.empty()) {
-                input.pop_back();
-                input.pop_back();
-                write(
-# 246 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
-                     1
-# 246 "/home/grzegorz/HSE/TBCS/interface.h"
-                                  , "\b \b", 3);
-            }
-        } else if (c != '\n') {
-            input += c;
-            write(
-# 250 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
-                 1
-# 250 "/home/grzegorz/HSE/TBCS/interface.h"
-                              , &c, 1);
+
+    do {
+        if (!message.empty()) {
+            std::cout << '\n' << message << ' ';
         }
-    }
-    write(
-# 253 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
-         1
-# 253 "/home/grzegorz/HSE/TBCS/interface.h"
-                      , "\n", 1);
-    tcsetattr(
-# 254 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
-             0
-# 254 "/home/grzegorz/HSE/TBCS/interface.h"
-                         , 
-# 254 "/home/grzegorz/HSE/TBCS/interface.h" 3 4
-                           0
-# 254 "/home/grzegorz/HSE/TBCS/interface.h"
-                                  , &oldt);
+        std::getline(std::cin, input);
+    } while (Trim(input).empty() && !emptyAllowed);
 
     return input;
 }
-# 3 "/home/grzegorz/HSE/TBCS/main.cpp" 2
+# 4 "/home/grzegorz/HSE/TBCS/main.cpp" 2
 # 1 "/home/grzegorz/HSE/TBCS/BinaryTree.h" 1
 
 
@@ -77230,216 +77168,6 @@ namespace std __attribute__ ((__visibility__ ("default")))
 # 67 "/usr/include/c++/14/stack" 2 3
 # 7 "/home/grzegorz/HSE/TBCS/BinaryTree.h" 2
 
-
-
-# 9 "/home/grzegorz/HSE/TBCS/BinaryTree.h"
-class BinaryTree {
-
-    class DuplicateException {
-    public:
-        DuplicateException () {
-            std::cerr << "Такой элемент уже существует.";
-        }
-    };
-
-    struct CoffeeVariety {
-        std::string name;
-        std::string origin;
-        std::string roast;
-        int caffeine{};
-        int price{};
-    };
-
-    CoffeeVariety *dataArr = {};
-    int arrLength = 0;
-
-
-    class Node {
-    public:
-        Node *pLeftByName;
-        Node *pRightByName;
-        Node *pLeftByPrice;
-        Node *pRightByPrice;
-        std::string name;
-        int price{};
-        int index;
-
-        explicit Node (const std::string &name, const int price, const int index, Node *pLeftByName = nullptr, Node *pRightByName = nullptr, Node *pLeftByPrice = nullptr, Node *pRightByPrice = nullptr) {
-            this->name = name;
-            this->price = price;
-            this->pLeftByName = pLeftByName;
-            this->pRightByName = pRightByName;
-            this->pLeftByPrice = pLeftByPrice;
-            this->pRightByPrice = pRightByPrice;
-            this->index = index;
-
-        }
-
-        [[nodiscard]] std::string ToString (const CoffeeVariety &data, const char split = ' ') const {
-            return this->name + split + data.origin + split + std::to_string(data.caffeine) + split + data.roast + split + std::to_string(this->price);
-        }
-    };
-
-    Node *pRootByName;
-    Node *pRootByPrice;
-
-public:
-    BinaryTree();
-    ~BinaryTree();
-
-    void push (const std::string &name, const std::string &origin, const std::string &roast, const int caffeine, const int price) {
-
-
-
-
-
-        const auto pTemp = new Node(name, price, arrLength);
-        auto *tempArr = new CoffeeVariety[arrLength+1];
-
-        for (int i = 0; i < arrLength; i++) {
-            tempArr[i] = dataArr[i];
-        }
-
-        tempArr[arrLength++] = {name, origin, roast, caffeine, price};
-        dataArr = tempArr;
-
-        if (pRootByName == nullptr) {
-            pRootByName = pTemp;
-            pRootByPrice = pRootByName;
-
-        } else {
-            Node *pCurrentByName = pRootByName;
-            Node *pCurrentByPrice = pRootByPrice;
-            Node *pPrevByName = nullptr;
-            Node *pPrevByPrice = nullptr;
-
-            while (pCurrentByName != nullptr) {
-                pPrevByName = pCurrentByName;
-                if (strcmp(name.c_str(), pCurrentByName->name.c_str()) < 0) {
-                    pCurrentByName = pCurrentByName->pLeftByName;
-                } else {
-                    pCurrentByName = pCurrentByName->pRightByName;
-                }
-            }
-
-            while (pCurrentByPrice != nullptr) {
-                pPrevByPrice = pCurrentByPrice;
-                if (price < pCurrentByPrice->price) {
-                    pCurrentByPrice = pCurrentByPrice->pLeftByPrice;
-                } else {
-                    pCurrentByPrice = pCurrentByPrice->pRightByPrice;
-                }
-            }
-
-            if (strcmp(name.c_str(), pPrevByName->name.c_str()) < 0)
-                pPrevByName->pLeftByName = pTemp;
-            else
-                pPrevByName->pRightByName = pTemp;
-
-            if (price < pPrevByPrice->price)
-                pPrevByPrice->pLeftByPrice = pTemp;
-            else
-                pPrevByPrice->pRightByPrice = pTemp;
-        }
-    }
-
-    [[nodiscard]] Node *FindByName(const std::string &name, int order = 0) const;
-    [[nodiscard]] std::string FindByName(const std::string &name, char split, int order = 0) const;
-    [[nodiscard]] Node *FindByPrice(int price, int order = 0) const;
-    [[nodiscard]] std::string FindByPrice (int price, char split, int order = 0) const;
-    [[nodiscard]] std::string Show (bool byName = true) const;
-    static void Show(const Node *node, std::string &output, CoffeeVariety *dataArr, bool byName = true, int depth = 0);
-};
-
-inline BinaryTree::BinaryTree() {
-    pRootByName = nullptr;
-    pRootByPrice = nullptr;
-    arrLength = 0;
-}
-
-inline BinaryTree::~BinaryTree() {
-    if (pRootByName == nullptr) return;
-
-    std::stack<Node*> nodeStack;
-    nodeStack.push(pRootByName);
-
-    while (!nodeStack.empty()) {
-        const Node* current = nodeStack.top();
-        nodeStack.pop();
-
-        if (current->pLeftByName) nodeStack.push(current->pLeftByName);
-        if (current->pRightByName) nodeStack.push(current->pRightByName);
-
-        delete current;
-    }
-
-    pRootByName = nullptr;
-}
-
-inline BinaryTree::Node *BinaryTree::FindByName(const std::string &name, int order) const {
-    Node *pCurrent = pRootByName;
-
-    while (strcmp(name.c_str(), pCurrent->name.c_str()) != 0 || order > -1) {
-        if (strcmp(name.c_str(), pCurrent->name.c_str()) < 0) {
-            if (pCurrent->pLeftByName == nullptr)
-                return nullptr;
-            pCurrent = pCurrent->pLeftByName;
-        }
-        else if (strcmp(name.c_str(), pCurrent->name.c_str()) > 0 || order > 0) {
-            if (pCurrent->pRightByName == nullptr)
-                return nullptr;
-            pCurrent = pCurrent->pRightByName;
-        }
-        else order--;
-    }
-
-    return pCurrent;
-}
-
-inline std::string BinaryTree::FindByName(const std::string &name, const char split, const int order) const {
-    const Node *temp = FindByName(name, order);
-    return temp != nullptr ? temp->ToString(dataArr[temp->index], split) : " ";
-}
-
-
-inline BinaryTree::Node *BinaryTree::FindByPrice(const int price, int order) const {
-    Node *pCurrent = pRootByPrice;
-
-    while (price != pCurrent->price || order > -1) {
-        if (price < pCurrent->price) {
-            if (pCurrent->pLeftByPrice == nullptr)
-                return nullptr;
-            pCurrent = pCurrent->pLeftByPrice;
-        }
-        else if (price > pCurrent->price || order > 0) {
-            if (pCurrent->pRightByPrice == nullptr)
-                return nullptr;
-            pCurrent = pCurrent->pRightByPrice;
-        }
-        else order--;
-    }
-
-    return pCurrent;
-}
-
-inline std::string BinaryTree::FindByPrice(const int price, const char split, int order) const {
-    const Node *temp = FindByPrice(price, order);
-    return temp != nullptr ? temp->ToString(dataArr[temp->index], split) : " ";
-}
-
-inline void BinaryTree::Show(const Node *node, std::string &output, CoffeeVariety *dataArr, bool byName, int depth ) {
-    if (!node) return;
-    Show(byName ? node-> pRightByName : node->pRightByPrice, output, dataArr, byName, depth + 1);
-    output += std::string(depth * 20, ' ') + node->ToString(dataArr[node->index]) + "\n";
-    Show(byName ? node->pLeftByName : node->pLeftByPrice, output, dataArr, byName, depth + 1);
-}
-
-inline std::string BinaryTree::Show(const bool byName) const {
-    std::string output;
-    Show(byName ? pRootByName : pRootByPrice, output, dataArr, byName);
-    return output;
-}
-# 4 "/home/grzegorz/HSE/TBCS/main.cpp" 2
 # 1 "/home/grzegorz/HSE/TBCS/List.h" 1
 
 
@@ -77459,8 +77187,9 @@ inline std::string BinaryTree::Show(const bool byName) const {
 
 
 
-class List {
 
+# 8 "/home/grzegorz/HSE/TBCS/List.h"
+class List {
     class DuplicateException {
     public:
         DuplicateException () {
@@ -77475,7 +77204,6 @@ class List {
         int caffeine{};
         int price{};
     };
-
     CoffeeVariety *dataArr = {};
     int arrLength = 0;
 
@@ -77484,10 +77212,7 @@ public:
     ~List();
 
     void push (const std::string &name, const std::string &origin, const std::string &roast, const int caffeine, const int price) {
-
-
-
-
+        if (this->FindByName(name) != nullptr || this->FindByPrice(price) != nullptr) throw DuplicateException();
 
         const auto pTemp = new Node(name, price, arrLength);
         auto *tempArr = new CoffeeVariety[arrLength+1];
@@ -77544,7 +77269,6 @@ public:
         }
     }
 
-private:
     class Node {
     public:
         Node *pNextByName;
@@ -77573,12 +77297,15 @@ private:
     Node *pHeadByPrice;
     Node *pHeadByInput;
 
-public:
-    [[nodiscard]] Node *FindByName(const std::string &name, int order = 0) const;
-    [[nodiscard]] std::string FindByName (const std::string &name, char split, int order = 0) const;
-    [[nodiscard]] Node *FindByPrice (int price, int order = 0) const;
-    [[nodiscard]] std::string FindByPrice (int price, char split, int order = 0) const;
-    [[nodiscard]] std::string Show (char split = '\n', int order = 0) const;
+    [[nodiscard]] Node *FindByName(const std::string &name) const;
+    [[nodiscard]] std::string FindByName (const std::string &name, char split, bool recursive) const;
+    [[nodiscard]] Node *FindByPrice (int price) const;
+    [[nodiscard]] std::string FindByPrice (int price, char split, bool recursive) const;
+    [[nodiscard]] std::string Show (char split = '\n', int order = 0, bool reverse = false) const;
+    [[nodiscard]] bool Remove(const std::string &name);
+    [[nodiscard]] bool Remove (int price);
+    static Node *FindByNameRecursive(Node *node, const std::string &name);
+    static Node *FindByPriceRecursive(Node *node, int price);
 };
 
 inline List::List() {
@@ -77595,71 +77322,62 @@ inline List::~List() {
     }
 }
 
-inline List::Node *List::FindByName(const std::string &name, int order) const {
+inline List::Node *List::FindByName(const std::string &name) const {
     Node *pCurrent = pHeadByName;
 
-    while (order > -1) {
+    if (!pCurrent) return nullptr;
         while (strcmp (name.c_str(), pCurrent->name.c_str()) > 0) {
             if (pCurrent->pNextByName == nullptr)
                 return nullptr;
             pCurrent = pCurrent->pNextByName;
         }
 
-        if (strcmp (name.c_str(), pCurrent->name.c_str()) < 0)
-            break;
-
-        if (strcmp (name.c_str(), pCurrent->name.c_str()) == 0) {
-            if (order-- == 0)
-                return pCurrent;
-
-            if (pCurrent->pNextByName == nullptr)
-                return nullptr;
-            pCurrent = pCurrent->pNextByName;
-        }
-    }
+        if (strcmp (name.c_str(), pCurrent->name.c_str()) == 0)
+            return pCurrent;
 
     return nullptr;
 }
 
-inline std::string List::FindByName(const std::string &name, const char split, const int order) const {
-    const Node *temp = this->FindByName(name, order);
+inline std::string List::FindByName(const std::string &name, const char split, const bool recursive) const {
+    const Node *temp = recursive ? FindByNameRecursive(pHeadByName, name) : this->FindByName(name);
     return temp != nullptr ? temp->ToString(dataArr[temp->index], split) : "";
 }
 
 
-inline List::Node *List::FindByPrice(const int price, int order) const {
+inline List::Node *List::FindByPrice(const int price) const {
     Node *pCurrent = pHeadByPrice;
 
-    while (order > -1) {
-        while (price > pCurrent->price) {
-            if (pCurrent->pNextByPrice == nullptr)
-                return nullptr;
-            pCurrent = pCurrent->pNextByPrice;
-        }
-
-        if (price < pCurrent->price)
-            break;
-
-        if (price == pCurrent->price) {
-            if (order-- == 0)
-                return pCurrent;
-
-            if (pCurrent->pNextByPrice != nullptr)
-                pCurrent = pCurrent->pNextByPrice;
-            else
-                return nullptr;
-        }
+    if (!pCurrent) return nullptr;
+    while (price > pCurrent->price) {
+        if (pCurrent->pNextByName == nullptr)
+            return nullptr;
+        pCurrent = pCurrent->pNextByName;
     }
+
+    if (price == pCurrent->price)
+        return pCurrent;
 
     return nullptr;
 }
 
-inline std::string List::FindByPrice(const int price, const char split, const int order) const {
-    const Node *temp = this->FindByPrice(price, order);
+inline std::string List::FindByPrice(const int price, const char split, const bool recursive) const {
+    const Node *temp = recursive ? FindByPriceRecursive(pHeadByPrice, price) : this->FindByPrice(price);
     return temp != nullptr ? temp->ToString(dataArr[temp->index], split) : "";
 }
 
-inline std::string List::Show(const char split, const int order) const {
+inline List::Node *List::FindByNameRecursive(Node *node, const std::string &name) {
+    if (!node || strcmp(name.c_str(), node->name.c_str()) <= 0)
+        return (node && strcmp(name.c_str(), node->name.c_str()) == 0) ? node : nullptr;
+    return FindByNameRecursive(node->pNextByName, name);
+}
+
+inline List::Node *List::FindByPriceRecursive(Node *node, const int price) {
+    if (!node || price <= node->price)
+        return (node && price == node->price) ? node : nullptr;
+    return FindByPriceRecursive(node->pNextByPrice, price);
+}
+
+inline std::string List::Show(const char split, const int order, const bool reverse) const {
     const Node *pCurrent;
 
     switch (order) {
@@ -77674,18 +77392,728 @@ inline std::string List::Show(const char split, const int order) const {
             break;
     }
 
-    std::string result;
+    std::string output;
 
     while (pCurrent != nullptr) {
-        result += pCurrent->ToString(dataArr[pCurrent->index]) + split;
+        std::string result = pCurrent->ToString(dataArr[pCurrent->index]);
         pCurrent = order == 0 ? pCurrent->pNextByName :
                    order == 1 ? pCurrent->pNextByPrice :
                    pCurrent->pNextByInput;
+
+        if (!reverse) output += result + split;
+        else output = result + split + output;
     }
 
-    return result;
+    return output;
+}
+
+inline bool List::Remove(const std::string &name) {
+    if (!pHeadByName) return false;
+
+    Node *pPrev = nullptr;
+    Node *pCurrent = pHeadByName;
+
+    while (pCurrent && strcmp(name.c_str(), pCurrent->name.c_str()) > 0) {
+        pPrev = pCurrent;
+        pCurrent = pCurrent->pNextByName;
+    }
+
+    if (!pCurrent || strcmp(name.c_str(), pCurrent->name.c_str()) != 0) {
+        return false;
+    }
+
+    if (pPrev) {
+        pPrev->pNextByName = pCurrent->pNextByName;
+    } else {
+        pHeadByName = pCurrent->pNextByName;
+    }
+
+    Node *pPrevPrice = nullptr, *pCurrentPrice = pHeadByPrice;
+    while (pCurrentPrice && pCurrentPrice != pCurrent) {
+        pPrevPrice = pCurrentPrice;
+        pCurrentPrice = pCurrentPrice->pNextByPrice;
+    }
+
+    if (pCurrentPrice) {
+        if (pPrevPrice) {
+            pPrevPrice->pNextByPrice = pCurrentPrice->pNextByPrice;
+        } else {
+            pHeadByPrice = pCurrentPrice->pNextByPrice;
+        }
+    }
+
+    Node *pPrevInput = nullptr, *pCurrentInput = pHeadByInput;
+    while (pCurrentInput && pCurrentInput != pCurrent) {
+        pPrevInput = pCurrentInput;
+        pCurrentInput = pCurrentInput->pNextByInput;
+    }
+
+    if (pCurrentInput) {
+        if (pPrevInput) {
+            pPrevInput->pNextByInput = pCurrentInput->pNextByInput;
+        } else {
+            pHeadByInput = pCurrentInput->pNextByInput;
+        }
+    }
+
+    auto *tempArr = new CoffeeVariety[arrLength - 1];
+    for (int i = 0, j = 0; i < arrLength; ++i) {
+        if (i != pCurrent->index) {
+            tempArr[j++] = dataArr[i];
+        }
+    }
+
+    delete[] dataArr;
+    dataArr = tempArr;
+    arrLength--;
+
+    Node *pUpdate = pHeadByInput;
+    int newIndex = 0;
+    while (pUpdate) {
+        pUpdate->index = newIndex++;
+        pUpdate = pUpdate->pNextByInput;
+    }
+
+    delete pCurrent;
+    return true;
+}
+
+inline bool List::Remove(const int price) {
+    if (!pHeadByPrice) return false;
+
+    Node *pCurrent = pHeadByPrice;
+
+    while (pCurrent && price > pCurrent->price)
+        pCurrent = pCurrent->pNextByPrice;
+
+    if (!pCurrent || price != pCurrent->price)
+        return false;
+
+    return Remove(pCurrent->name);
+}
+# 9 "/home/grzegorz/HSE/TBCS/BinaryTree.h" 2
+
+
+class BinaryTree {
+
+    class DuplicateException {
+    public:
+        DuplicateException () {
+            std::cerr << "Такой элемент уже существует.";
+        }
+    };
+
+    struct CoffeeVariety {
+        std::string name;
+        std::string origin;
+        std::string roast;
+        int caffeine{};
+        int price{};
+    };
+
+    CoffeeVariety *dataArr = {};
+    int arrLength = 0;
+    int empty = 0;
+
+public:
+    class Node {
+    public:
+        Node *pLeftByName;
+        Node *pRightByName;
+        Node *pLeftByPrice;
+        Node *pRightByPrice;
+        std::string name;
+        int price{};
+        int index;
+
+        explicit Node (const std::string &name, const int price, const int index, Node *pLeftByName = nullptr, Node *pRightByName = nullptr, Node *pLeftByPrice = nullptr, Node *pRightByPrice = nullptr) {
+            this->name = name;
+            this->price = price;
+            this->pLeftByName = pLeftByName;
+            this->pRightByName = pRightByName;
+            this->pLeftByPrice = pLeftByPrice;
+            this->pRightByPrice = pRightByPrice;
+            this->index = index;
+
+        }
+
+        [[nodiscard]] std::string ToString (const CoffeeVariety &data, const char split = ' ') const {
+            return this->name + split + data.origin + split + std::to_string(data.caffeine) + split + data.roast + split + std::to_string(this->price);
+        }
+    };
+
+    Node *pRootByName;
+    Node *pRootByPrice;
+
+    BinaryTree();
+    ~BinaryTree();
+
+    void push (const std::string &name, const std::string &origin, const std::string &roast, const int caffeine, const int price) {
+        if (this->FindByName(name) != nullptr || this->FindByPrice(price) != nullptr) throw DuplicateException();
+
+        int j = -1;
+        while (++j < arrLength && dataArr[j].price != -1)
+            ;
+        const auto pTemp = new Node(name, price, arrLength);
+
+        if (j == arrLength) {
+            auto *tempArr = new CoffeeVariety[arrLength+1];
+
+            for (int i = 0; i < arrLength; i++) tempArr[i] = dataArr[i];
+
+            tempArr[arrLength++] = {name, origin, roast, caffeine, price};
+            dataArr = tempArr;
+        }
+        else {
+            pTemp->index = j;
+            dataArr[j] = {name, origin, roast, caffeine, price};
+        }
+
+        if (pRootByName == nullptr) {
+            pRootByName = pTemp;
+            pRootByPrice = pRootByName;
+
+        } else {
+            Node *pCurrentByName = pRootByName;
+            Node *pCurrentByPrice = pRootByPrice;
+            Node *pPrevByName = nullptr;
+            Node *pPrevByPrice = nullptr;
+
+            while (pCurrentByName != nullptr) {
+                pPrevByName = pCurrentByName;
+                if (strcmp(name.c_str(), pCurrentByName->name.c_str()) < 0) {
+                    pCurrentByName = pCurrentByName->pLeftByName;
+                } else {
+                    pCurrentByName = pCurrentByName->pRightByName;
+                }
+            }
+
+            while (pCurrentByPrice != nullptr) {
+                pPrevByPrice = pCurrentByPrice;
+                if (price < pCurrentByPrice->price) {
+                    pCurrentByPrice = pCurrentByPrice->pLeftByPrice;
+                } else {
+                    pCurrentByPrice = pCurrentByPrice->pRightByPrice;
+                }
+            }
+
+            if (strcmp(name.c_str(), pPrevByName->name.c_str()) < 0)
+                pPrevByName->pLeftByName = pTemp;
+            else
+                pPrevByName->pRightByName = pTemp;
+
+            if (price < pPrevByPrice->price)
+                pPrevByPrice->pLeftByPrice = pTemp;
+            else
+                pPrevByPrice->pRightByPrice = pTemp;
+        }
+    }
+
+private:
+    static Node* ToTree(Node** nodes, int start, int end, bool byName = true);
+    static void ToArray(Node* node, Node** nodes, int& index, bool byName = true);
+public:
+    void balanceTree(bool byName = true);
+    [[nodiscard]] Node *FindByName(const std::string &name) const;
+    [[nodiscard]] std::string FindByName(const std::string &name, char split, bool recursive) const;
+    [[nodiscard]] Node *FindByPrice(int price) const;
+    [[nodiscard]] std::string FindByPrice (int price, char split, bool recursive) const;
+    [[nodiscard]] std::string Show (bool byName = true) const;
+    static void Show(const Node *node, std::string &output, CoffeeVariety *dataArr, bool byName = true, int depth = 0);
+    [[nodiscard]] std::string ToString (bool byName = true, bool reverse = false) const;
+    static void ToString (const Node *node, std::string &output, CoffeeVariety *dataArr, bool byName = true, bool reverse = false);
+    bool Remove (const std::string &name);
+    bool Remove (int price);
+    void Remove (Node *parent, const Node *target, bool byName);
+
+    static Node* FindByNameRecursive(Node* node, const std::string &name);
+
+    static Node* FindByPriceRecursive(Node* node, int price);
+};
+
+inline BinaryTree::BinaryTree() {
+    pRootByName = nullptr;
+    pRootByPrice = nullptr;
+    arrLength = 0;
+}
+
+inline BinaryTree::~BinaryTree() {
+    if (pRootByName == nullptr) return;
+
+    std::stack<Node*> nodeStack;
+    nodeStack.push(pRootByName);
+
+    while (!nodeStack.empty()) {
+        const Node* current = nodeStack.top();
+        nodeStack.pop();
+
+        if (current->pLeftByName) nodeStack.push(current->pLeftByName);
+        if (current->pRightByName) nodeStack.push(current->pRightByName);
+
+        delete current;
+    }
+
+    pRootByName = nullptr;
+    delete [] dataArr;
+}
+
+inline BinaryTree::Node *BinaryTree::FindByName(const std::string &name) const {
+    Node *pCurrent = pRootByName;
+
+    if (!pCurrent) return nullptr;
+
+    while (strcmp(name.c_str(), pCurrent->name.c_str()) != 0) {
+        if (strcmp(name.c_str(), pCurrent->name.c_str()) < 0) {
+            if (pCurrent->pLeftByName == nullptr)
+                return nullptr;
+            pCurrent = pCurrent->pLeftByName;
+        }
+        else if (strcmp(name.c_str(), pCurrent->name.c_str()) > 0) {
+            if (pCurrent->pRightByName == nullptr)
+                return nullptr;
+            pCurrent = pCurrent->pRightByName;
+        }
+    }
+
+    return pCurrent;
+}
+
+inline std::string BinaryTree::FindByName(const std::string &name, const char split, const bool recursive) const {
+    const Node *temp = recursive ? FindByNameRecursive(pRootByName, name) : FindByName(name);
+    return temp != nullptr ? temp->ToString(dataArr[temp->index], split) : " ";
+}
+
+
+inline BinaryTree::Node *BinaryTree::FindByPrice(const int price) const {
+    Node *pCurrent = pRootByPrice;
+
+    if (!pCurrent) return nullptr;
+
+    while (price != pCurrent->price) {
+        if (price < pCurrent->price) {
+            if (pCurrent->pLeftByPrice == nullptr)
+                return nullptr;
+            pCurrent = pCurrent->pLeftByPrice;
+        }
+        else if (price > pCurrent->price) {
+            if (pCurrent->pRightByPrice == nullptr)
+                return nullptr;
+            pCurrent = pCurrent->pRightByPrice;
+        }
+    }
+
+    return pCurrent;
+}
+
+inline std::string BinaryTree::FindByPrice(const int price, const char split, const bool recursive) const {
+    const Node *temp = recursive ? FindByPriceRecursive(pRootByPrice, price) : FindByPrice(price);
+    return temp != nullptr ? temp->ToString(dataArr[temp->index], split) : " ";
+}
+
+inline BinaryTree::Node* BinaryTree::FindByNameRecursive(Node* node, const std::string &name) {
+    if (!node || node->name == name) return node;
+    if (name < node->name)
+        return FindByNameRecursive(node->pLeftByName, name);
+    return FindByNameRecursive(node->pRightByName, name);
+}
+
+inline BinaryTree::Node* BinaryTree::FindByPriceRecursive(Node* node, const int price) {
+    if (!node || node->price == price) return node;
+    if (price < node->price)
+        return FindByPriceRecursive(node->pLeftByPrice, price);
+    return FindByPriceRecursive(node->pRightByPrice, price);
+}
+
+
+inline void BinaryTree::Show(const Node *node, std::string &output, CoffeeVariety *dataArr, bool byName, int depth ) {
+    if (!node) return;
+    Show(byName ? node-> pRightByName : node->pRightByPrice, output, dataArr, byName, depth + 1);
+    output += std::string(depth * 20, ' ') + '|' + node->ToString(dataArr[node->index]) + "\n";
+    Show(byName ? node->pLeftByName : node->pLeftByPrice, output, dataArr, byName, depth + 1);
+}
+
+inline std::string BinaryTree::Show(const bool byName) const {
+    std::string output;
+    Show(byName ? pRootByName : pRootByPrice, output, dataArr, byName);
+    return output;
+}
+
+inline void BinaryTree::balanceTree(bool byName) {
+    int count = 0;
+    ToArray(byName ? pRootByName : pRootByPrice, nullptr, count);
+    const auto nodes = new Node*[count];
+    int index = 0;
+    ToArray(byName ? pRootByName : pRootByPrice, nodes, index);
+    byName ? pRootByName : pRootByPrice = ToTree(nodes, 0, count - 1);
+    delete[] nodes;
+}
+
+
+inline BinaryTree::Node* BinaryTree::ToTree(Node** nodes, const int start, const int end, bool byName) {
+    if (start > end) return nullptr;
+    const int mid = (start + end) / 2;
+    Node* node = nodes[mid];
+    byName ? node->pLeftByName : node->pLeftByPrice = ToTree(nodes, start, mid - 1);
+    byName ? node->pRightByName : node->pRightByPrice = ToTree(nodes, mid + 1, end);
+    return node;
+}
+
+inline void BinaryTree::ToArray(Node* node, Node** nodes, int& index, bool byName) {
+    if (!node) return;
+    ToArray(byName ? node->pLeftByName : node->pLeftByPrice, nodes, index);
+    if (nodes) nodes[index] = node;
+    index++;
+    ToArray(byName ? node->pRightByName : node->pRightByPrice, nodes, index);
+}
+
+inline std::string BinaryTree::ToString(const bool byName, const bool reverse) const {
+    std::string output;
+    ToString(byName ? pRootByName : pRootByPrice, output, dataArr, byName, reverse);
+    return output;
+}
+
+inline void BinaryTree::ToString(const Node *node, std::string &output, CoffeeVariety *dataArr, const bool byName, const bool reverse) {
+    if (!node) return;
+    ToString(byName ? node->pLeftByName : node->pLeftByPrice, output, dataArr, byName, reverse);
+    if (!reverse) output += node->ToString(dataArr[node->index]) + '\n';
+    else output = node->ToString(dataArr[node->index]) + '\n' + output;
+    ToString(byName ? node->pRightByName : node->pRightByPrice, output, dataArr, byName, reverse);
+}
+
+inline bool BinaryTree::Remove(const std::string &name) {
+    Node *parentByName = nullptr;
+    Node *parentByPrice = nullptr;
+    Node *current = pRootByName;
+
+    while (current != nullptr && current->name != name) {
+        parentByName = current;
+        if (name < current->name) current = current->pLeftByName;
+        else current = current->pRightByName;
+    }
+
+    if (current == nullptr) return false;
+
+    parentByPrice = nullptr;
+    Node *currentByPrice = pRootByPrice;
+    while (currentByPrice != nullptr && currentByPrice != current) {
+        parentByPrice = currentByPrice;
+        if (current->price < currentByPrice->price)
+            currentByPrice = currentByPrice->pLeftByPrice;
+        else
+            currentByPrice = currentByPrice->pRightByPrice;
+    }
+
+    Remove(parentByName, current, true);
+    Remove(parentByPrice, current, false);
+
+    delete current;
+
+    return true;
+}
+
+inline bool BinaryTree::Remove(const int price) {
+    Node *parentByPrice = nullptr;
+    Node *parentByName = nullptr;
+    Node *current = pRootByPrice;
+
+    while (current != nullptr && current->price != price) {
+        parentByPrice = current;
+        if (price < current->price)
+            current = current->pLeftByPrice;
+        else
+            current = current->pRightByPrice;
+    }
+
+    if (current == nullptr) return false;
+
+    parentByName = nullptr;
+    Node *currentByName = pRootByName;
+    while (currentByName != nullptr && currentByName != current) {
+        parentByName = currentByName;
+        if (current->name < currentByName->name)
+            currentByName = currentByName->pLeftByName;
+        else
+            currentByName = currentByName->pRightByName;
+    }
+
+    Remove(parentByName, current, true);
+    Remove(parentByPrice, current, false);
+
+    delete current;
+
+    return true;
+}
+
+inline void BinaryTree::Remove(Node *parent, const Node *target, const bool byName) {
+    Node *child = (byName ? target->pLeftByName : target->pLeftByPrice) ?
+                  (byName ? target->pLeftByName : target->pLeftByPrice) :
+                  (byName ? target->pRightByName : target->pRightByPrice);
+
+    const int index = target->index;
+    dataArr[index].name = "";
+    dataArr[index].caffeine = -1;
+    dataArr[index].origin = "";
+    dataArr[index].price = -1;
+    dataArr[index].roast = "";
+    empty++;
+
+    if (parent == nullptr) {
+        if (byName)
+            pRootByName = child;
+        else
+            pRootByPrice = child;
+    } else {
+        if (byName) {
+            if (parent->pLeftByName == target)
+                parent->pLeftByName = child;
+            else
+                parent->pRightByName = child;
+        } else {
+            if (parent->pLeftByPrice == target)
+                parent->pLeftByPrice = child;
+            else
+                parent->pRightByPrice = child;
+        }
+    }
 }
 # 5 "/home/grzegorz/HSE/TBCS/main.cpp" 2
+
+# 1 "/home/grzegorz/HSE/TBCS/Array.h" 1
+
+
+# 1 "/usr/include/c++/14/cstring" 1 3
+# 39 "/usr/include/c++/14/cstring" 3
+       
+# 40 "/usr/include/c++/14/cstring" 3
+
+
+# 1 "/usr/include/c++/14/bits/version.h" 1 3
+# 47 "/usr/include/c++/14/bits/version.h" 3
+       
+# 48 "/usr/include/c++/14/bits/version.h" 3
+# 43 "/usr/include/c++/14/cstring" 2 3
+# 4 "/home/grzegorz/HSE/TBCS/Array.h" 2
+
+
+class Array {
+    class DuplicateException {
+    public:
+        DuplicateException () {
+            std::cerr << "Такой элемент уже существует.";
+        }
+    };
+
+    struct CoffeeVariety {
+        std::string name;
+        std::string origin;
+        std::string roast;
+        int caffeine{};
+        int price{};
+
+        CoffeeVariety& operator =(const CoffeeVariety &other) = default;
+    };
+
+
+
+    struct CoffeeByName {
+        std::string name;
+        int index{};
+    };
+
+    struct CoffeeByPrice {
+        int price{};
+        int index{};
+    };
+
+    CoffeeByName *arrayByName = {};
+    CoffeeByPrice *arrayByPrice = {};
+    CoffeeVariety *dataArr = {};
+    int arrLength = 0;
+
+public:
+    Array() = default;
+    ~Array() {
+        delete [] arrayByName;
+        delete [] arrayByPrice;
+        delete [] dataArr;
+    }
+
+    void push (const std::string &name, const std::string &origin, const std::string &roast, const int caffeine, const int price) {
+        if (arrLength > 0 && (FindByName(name, 0, arrLength - 1) != -1 || !FindByPrice(price, false).empty())) throw DuplicateException();
+
+        const CoffeeVariety sTemp = {name, origin, roast, caffeine, price};
+
+        auto *tempArr = new CoffeeVariety[arrLength + 1]{};
+        for (int i = 0; i < arrLength; i++) tempArr[i] = dataArr[i];
+
+        tempArr[arrLength++] = sTemp;
+        delete[] dataArr;
+        dataArr = tempArr;
+
+        if (arrLength == 1) {
+            arrayByName = new CoffeeByName[1];
+            arrayByName[0] = {name, 0};
+            arrayByPrice = new CoffeeByPrice[1];
+            arrayByPrice[0] = {price, 0};
+            dataArr = new CoffeeVariety[1];
+            dataArr[0] = {name, origin, roast, caffeine, price};
+        }
+        else {
+            auto *tempNameArr = new CoffeeByName[arrLength];
+            int i = -1;
+            while (++i < arrLength - 1 && strcmp(name.c_str(), arrayByName[i].name.c_str()) > 0) {
+                tempNameArr[i] = arrayByName[i];
+            }
+            tempNameArr[i] = {name, arrLength - 1};
+            while (++i < arrLength) {
+                tempNameArr[i] = arrayByName[i - 1];
+            }
+
+            delete [] arrayByName;
+            arrayByName = tempNameArr;
+
+            auto *tempPriceArr = new CoffeeByPrice[arrLength];
+            i = -1;
+            while (++i < arrLength - 1 && price > arrayByPrice[i].price) {
+                tempPriceArr[i] = arrayByPrice[i];
+            }
+            tempPriceArr[i] = {price, arrLength - 1};
+            while (++i < arrLength) {
+                tempPriceArr[i] = arrayByPrice[i - 1];
+            }
+
+            delete [] arrayByPrice;
+            arrayByPrice = tempPriceArr;
+        }
+    }
+
+    [[nodiscard]] std::string ToString (const int index) const {
+        if (index < 0 || index >= arrLength) return "";
+        return std::to_string(index) + ". " + dataArr[index].name + ' ' + dataArr[index].origin + ' ' + dataArr[index].roast + ' ' + std::to_string(dataArr[index].caffeine) + ' ' + std::to_string(dataArr[index].price);
+    }
+    [[nodiscard]] std::string Show (const bool byName = true, const bool reverse = false, const char split = '\n') const {
+        std::string output;
+        if (byName) {
+            for (int i = 0; i < arrLength; i++)
+                if (!reverse) output += ToString(arrayByName[i].index) + split;
+                else output = ToString(arrayByName[i].index) + split + output;
+        }
+        else {
+            for (int i = 0; i < arrLength; i++)
+                if (!reverse) output += ToString(arrayByPrice[i].index) + split;
+                else output = ToString(arrayByPrice[i].index) + split + output;
+        }
+
+        return output;
+    }
+
+    bool Edit(const int index, const std::string &name, const std::string &origin, const std::string &roast, const int caffeine, const int price) {
+        if (index < 0 || index >= arrLength) return false;
+        Remove(dataArr[index].name);
+        push(name, origin, roast, caffeine, price);
+        return true;
+    }
+
+    bool Remove(const std::string &name) {
+        const int index = FindByName(name, 0, arrLength - 1);
+        if (index == -1) return false;
+
+        auto *tempArr = new CoffeeVariety[arrLength - 1];
+        auto *tempNameArr = new CoffeeByName[arrLength - 1];
+        auto *tempPriceArr = new CoffeeByPrice[arrLength - 1];
+
+        int j = 0;
+        for (int i = 0; i < arrLength; i++) {
+            if (i != index) {
+                tempArr[j] = dataArr[i];
+                tempNameArr[j] = arrayByName[j];
+                tempNameArr[j].index = j;
+                tempPriceArr[j] = arrayByPrice[j];
+                tempPriceArr[j].index = j;
+                j++;
+            }
+        }
+
+        delete[] dataArr;
+        delete[] arrayByName;
+        delete[] arrayByPrice;
+
+        dataArr = tempArr;
+        arrayByName = tempNameArr;
+        arrayByPrice = tempPriceArr;
+        arrLength--;
+        return true;
+    }
+
+    bool Remove(const int price) {
+        const int index = FindByPrice(price);
+        if (index == -1) return false;
+
+        auto *tempArr = new CoffeeVariety[arrLength - 1];
+        auto *tempNameArr = new CoffeeByName[arrLength - 1];
+        auto *tempPriceArr = new CoffeeByPrice[arrLength - 1];
+
+        int j = 0;
+        for (int i = 0; i < arrLength; i++) {
+            if (i != index) {
+                tempArr[j] = dataArr[i];
+                tempNameArr[j] = arrayByName[j];
+                tempNameArr[j].index = j;
+                tempPriceArr[j] = arrayByPrice[j];
+                tempPriceArr[j].index = j;
+                j++;
+            }
+        }
+
+        delete[] dataArr;
+        delete[] arrayByName;
+        delete[] arrayByPrice;
+
+        dataArr = tempArr;
+        arrayByName = tempNameArr;
+        arrayByPrice = tempPriceArr;
+        arrLength--;
+
+        return true;
+    }
+
+    [[nodiscard]] int FindByName(const std::string &name, const int left, const int right) const {
+        if (left > right) return -1;
+        const int mid = left + (right - left) / 2;
+        if (arrayByName[mid].name == name) return arrayByName[mid].index;
+        if (arrayByName[mid].name < name)
+            return FindByName(name, mid + 1, right);
+        return FindByName(name, left, mid - 1);
+    }
+
+    [[nodiscard]] int FindByName(const std::string &name, const int left) const {
+        return FindByName(name, left, arrLength - 1);
+    }
+
+    [[nodiscard]] std::string FindByName (const std::string &name) const {
+        return ToString (FindByName(name, 0, arrLength - 1));
+    }
+
+    [[nodiscard]] int FindByPrice(const int price) const {
+        int left = 0, right = arrLength - 1;
+        while (left <= right) {
+            const int mid = left + (right - left) / 2;
+            if (arrayByPrice[mid].price == price) return arrayByPrice[mid].index;
+            if (arrayByPrice[mid].price < price)
+                left = mid + 1;
+            else
+                right = mid - 1;
+        }
+        return -1;
+    }
+
+    [[nodiscard]] std::string FindByPrice(const int price, bool) const {
+        return ToString(FindByPrice(price));
+    }
+
+
+};
+# 7 "/home/grzegorz/HSE/TBCS/main.cpp" 2
 
 struct CoffeeVariety {
     std::string name;
@@ -77696,12 +78124,13 @@ struct CoffeeVariety {
 };
 
 
-void push(BinaryTree *tree, List *listC, const std::string &name, const std::string &origin, const std::string &roast, const int caffeine, const int price) {
+void push(BinaryTree *tree, List *listC, Array *arr, const std::string &name, const std::string &origin, const std::string &roast, const int caffeine, const int price) {
     tree->push(name, origin, roast, caffeine, price);
     listC->push(name, origin, roast, caffeine, price);
+    arr->push(name, origin, roast, caffeine, price);
 }
 
-void inputPush (BinaryTree *tree, List *listC, int count = 20) {
+void inputPush (BinaryTree *tree, List *listC, Array *arr, int count = 20) {
     CoffeeVariety temp;
 
     while (count-- > 0) {
@@ -77714,7 +78143,7 @@ void inputPush (BinaryTree *tree, List *listC, int count = 20) {
         temp.roast = InputString("Введите степень обжарки:");
         temp.caffeine = InputInt("Введите содержание кофеина:");
         temp.price = InputInt("Введите цену:");
-        push(tree, listC, temp.name, temp.origin, temp.roast, temp.caffeine, temp.price);
+        push(tree, listC, arr, temp.name, temp.origin, temp.roast, temp.caffeine, temp.price);
     }
 }
 
@@ -77734,72 +78163,128 @@ int main() {
     Pause();
     BinaryTree coffeeTree;
     List coffeeList;
+    Array coffeeArray;
     int count = 20;
     char yesNoOptions[2][1024] = {"Да", "Нет"};
 
     if (Menu (yesNoOptions, 2, const_cast<char *>("Загрузить данные из шаблона?")) == 0) {
-        push(&coffeeTree, &coffeeList, "Иргачиф", "Эфиопия", "Светлая", 50, 46);
-        push(&coffeeTree, &coffeeList, "Супремо", "Колумбия", "Средняя", 60, 30);
-        push(&coffeeTree, &coffeeList, "Сантос", "Бразилия", "Средняя", 60, 28);
-        push(&coffeeTree, &coffeeList, "Малабарский муссон", "Индия", "Тёмная", 70, 29);
-        push(&coffeeTree, &coffeeList, "Антигуа", "Гватемала", "Светлая", 50, 35);
-        push(&coffeeTree, &coffeeList, "Тарразу", "Коста Рика", "Средняя", 60, 38);
+        push(&coffeeTree, &coffeeList, &coffeeArray, "Иргачиф", "Эфиопия", "Светлая", 50, 46);
+        push(&coffeeTree, &coffeeList, &coffeeArray, "Супремо", "Колумбия", "Средняя", 60, 30);
+        push(&coffeeTree, &coffeeList, &coffeeArray, "Сантос", "Бразилия", "Средняя", 60, 28);
+        push(&coffeeTree, &coffeeList, &coffeeArray, "Малабарский муссон", "Индия", "Тёмная", 70, 29);
+        push(&coffeeTree, &coffeeList, &coffeeArray, "Антигуа", "Гватемала", "Светлая", 50, 35);
+        push(&coffeeTree, &coffeeList, &coffeeArray, "Тарразу", "Коста Рика", "Средняя", 60, 38);
         std::cout << "Загружено:\n" << coffeeList.Show() << '\n';
         count -= 6;
     }
 
-    inputPush(&coffeeTree, &coffeeList, count);
+    inputPush(&coffeeTree, &coffeeList, &coffeeArray, count);
 
     bool isRunning = true;
     std::string content;
 
     while (isRunning) {
-        char options[][1024] = {"Показать список", "Найти по названию", "Найти по цене", "Показать дерево", "Выйти"};
+        char options[][1024] = {"Добавить элементы", "Показать список", "Найти в списке", "Удалить из списка", "Показать дерево", "Балансировать дерево", "Найти в дереве", "Удалить из дерева", "Показать массив", "Найти в массиве", "Редактировать элемент", "Удалить элемент", "Выйти"};
         char sortOptions[][1024] = {"По названию", "По цене", "По порядку добавления"};
-        switch (Menu(options, 5, const_cast<char *>("Выберите действие:"), content)) {
+        char treeOptions[][1024] = {"В виде дерева", "В виде списка"};
+        char orderOptions[][1024] = {"В прямом", "В обратном"};
+        switch (Menu(options, 13, const_cast<char *>("Выберите действие:"), content)) {
             case 0: {
-                content = coffeeList.Show('\n', Menu (sortOptions, 3, const_cast<char *>("Выберите порядок:"), content));
+                inputPush(&coffeeTree, &coffeeList, &coffeeArray, count);
                 break;
             }
             case 1: {
-                std::string searchName = InputString("Введите название:");
-                int order = 0;
-                content = "";
-                std::string coffeeString = coffeeList.FindByName(searchName, ' ', order);
-
-                if (coffeeString.empty())
-                    content = "Такого элемента нет.";
-                else {
-                    coffeeString = "1. " + coffeeString;
-                    content += coffeeString + '\n';
-
-                    while (!coffeeString.empty()) {
-                        coffeeString = static_cast<char>(order + 1) + ". " + coffeeList.FindByName(searchName, ' ', ++order);
-                        content += coffeeString + '\n';
-                    }
-                }
+                content = coffeeList.Show('\n', Menu (sortOptions, 3, const_cast<char *>("Выберите порядок:"), content), Menu (orderOptions, 2, const_cast<char *>("Выберите порядок:"), content) == 1);
                 break;
             }
             case 2: {
-                const int searchPrice = InputInt("Введите цену:");
-                int order = 0;
-                content = "";
-                std::string coffeeString = coffeeList.FindByPrice(searchPrice, ' ', order);
-
-                if (coffeeString.empty())
-                    content = "Такого элемента нет.";
-                else {
-                    content += coffeeString + '\n';
-
-                    while (!coffeeString.empty()) {
-                        coffeeString = coffeeList.FindByPrice(searchPrice, ' ', ++order);
-                        content += coffeeString + '\n';
-                    }
-                }
+                std::string coffeeString;
+                if (Menu(sortOptions, 2, const_cast<char *>("Выберите атрибут")) == 0)
+                    coffeeString = coffeeList.FindByName(InputString("Введите название:"), ' ', Menu (yesNoOptions, 2, const_cast<char *>("Рекурсией?")) == 0);
+                else
+                    coffeeString = coffeeList.FindByPrice(InputInt("Введите цену:"), ' ', Menu (yesNoOptions, 2, const_cast<char *>("Рекурсией?")) == 0);
+                if (coffeeString.empty()) content = "Такого элемента нет.";
+                else content = coffeeString;
                 break;
             }
             case 3: {
-                content = coffeeTree.Show(Menu (sortOptions, 2, const_cast<char *>("Выберите порядок:"), content) == 0);
+                if (Menu(sortOptions, 2, const_cast<char *>("Выберите атрибут")) == 0)
+                    if (coffeeList.Remove(InputString("Введите название:")))
+                        content = "Элемент удалён.";
+                    else content = "Такого элемента нет";
+                else if (coffeeList.Remove(InputInt("Введите цену:")))
+                        content = "Элемент удалён.";
+                else content = "Такого элемента нет";
+                break;
+            }
+            case 4: {
+                content = Menu(treeOptions, 2, const_cast<char *>("В каком виде?")) == 0
+                ? coffeeTree.Show(Menu (sortOptions, 2, const_cast<char *>("Выберите порядок:"), content) == 0)
+                : coffeeTree.ToString(Menu (sortOptions, 2, const_cast<char *>("Выберите порядок:"), content) == 0,
+                    Menu (orderOptions, 2, const_cast<char *>("Выберите порядок:"), content) == 1);
+                break;
+            }
+            case 5: {
+                coffeeTree.balanceTree();
+                coffeeTree.balanceTree(false);
+                content = "Дерево сбалансировано.";
+                break;
+            }
+            case 6: {
+                std::string coffeeString;
+                if (Menu(sortOptions, 2, const_cast<char *>("Выберите атрибут")) == 0)
+                    coffeeString = coffeeTree.FindByName(InputString("Введите название:"), ' ', Menu (yesNoOptions, 2, const_cast<char *>("Рекурсией?")) == 0);
+                else
+                    coffeeString = coffeeTree.FindByPrice(InputInt("Введите цену:"), ' ', Menu (yesNoOptions, 2, const_cast<char *>("Рекурсией?")) == 0);
+                if (coffeeString.empty()) content = "Такого элемента нет.";
+                else content = coffeeString;
+                break;
+            }
+            case 7: {
+                if (Menu(sortOptions, 2, const_cast<char *>("Выберите атрибут")) == 0)
+                    if (coffeeTree.Remove(InputString("Введите название:")))
+                        content = "Элемент удалён.";
+                    else content = "Такого элемента нет";
+                else if (coffeeTree.Remove(InputInt("Введите цену:")))
+                    content = "Элемент удалён.";
+                else content = "Такого элемента нет";
+                break;
+            }
+            case 8: {
+                content = coffeeArray.Show(Menu (sortOptions, 2, const_cast<char *>("Выберите порядок:"), content) == 0, Menu (orderOptions, 2, const_cast<char *>("Выберите порядок:"), content) == 1);
+                break;
+            }
+            case 9: {
+                std::string coffeeString;
+                if (Menu(sortOptions, 2, const_cast<char *>("Выберите атрибут")) == 0)
+                    coffeeString = coffeeArray.FindByName(InputString("Введите название:"));
+                else
+                    coffeeString = coffeeArray.FindByPrice(InputInt("Введите цену:"));
+                if (coffeeString.empty()) content = "Такого элемента нет.";
+                else content = coffeeString;
+                break;
+            }
+            case 10: {
+                int index;
+                if (Menu(sortOptions, 2, const_cast<char *>("Выберите атрибут")) == 0)
+                    index = coffeeArray.FindByName(InputString("Введите название:"), 0);
+                else
+                    index = coffeeArray.FindByPrice(InputInt("Введите цену:"));
+                if (index == -1) {
+                    content = "Такого элемента нет.";
+                    break;
+                }
+                if (coffeeArray.Edit(index, InputString("Введите новое название:"), InputString("Введите новое происхождение:"), InputString("Введите обжарку:"), InputInt("Введите содержание кофеина:"), InputInt("Введите новую цену"))) content = "Элемент редактирован.";
+                break;
+            }
+            case 11: {
+                if (Menu(sortOptions, 2, const_cast<char *>("Выберите атрибут")) == 0)
+                    if (coffeeArray.Remove(InputString("Введите название:")))
+                        content = "Элемент удалён.";
+                    else content = "Такого элемента нет";
+                else if (coffeeArray.Remove(InputInt("Введите цену:")))
+                        content = "Элемент удалён.";
+                else content = "Такого элемента нет";
                 break;
             }
             default: {
