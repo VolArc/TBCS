@@ -7,7 +7,6 @@
 
 #include "List.h"
 
-
 class BinaryTree {
 
     class DuplicateException {
@@ -86,7 +85,7 @@ public:
         if (pRootByName == nullptr) {
             pRootByName = pTemp;
             pRootByPrice = pRootByName;
-            
+
         } else {
             Node *pCurrentByName = pRootByName;
             Node *pCurrentByPrice = pRootByPrice;
@@ -124,8 +123,8 @@ public:
     }
 
 private:
-    static Node* ToTree(Node** nodes, int start, int end, bool byName = true);
-    static void ToArray(Node* node, Node** nodes, int& index, bool byName = true);
+    static Node* ToTree(Node** nodes, int start, int end, bool byName);
+    static void ToArray(Node* node, Node** nodes, int& index, bool byName);
 public:
     void balanceTree(bool byName = true);
     [[nodiscard]] Node *FindByName(const std::string &name) const;
@@ -254,30 +253,40 @@ inline std::string BinaryTree::Show(const bool byName) const {
 
 inline void BinaryTree::balanceTree(bool byName) {
     int count = 0;
-    ToArray(byName ? pRootByName : pRootByPrice, nullptr, count);
-    const auto nodes = new Node*[count];
+    ToArray(byName ? pRootByName : pRootByPrice, nullptr, count, byName);
+    auto* nodes = new Node*[count];
     int index = 0;
-    ToArray(byName ? pRootByName : pRootByPrice, nodes, index);
-    byName ? pRootByName : pRootByPrice = ToTree(nodes, 0, count - 1);
+    ToArray(byName ? pRootByName : pRootByPrice, nodes, index, byName);
+    Node* newRoot = ToTree(nodes, 0, count - 1, byName);
+    if (byName) {
+        pRootByName = newRoot;
+    } else {
+        pRootByPrice = newRoot;
+    }
     delete[] nodes;
 }
 
 
-inline BinaryTree::Node* BinaryTree::ToTree(Node** nodes, const int start, const int end, bool byName) {
+inline BinaryTree::Node* BinaryTree::ToTree(Node** nodes, int start, int end, bool byName) {
     if (start > end) return nullptr;
-    const int mid = (start + end) / 2;
+    int mid = (start + end) / 2;
     Node* node = nodes[mid];
-    byName ? node->pLeftByName : node->pLeftByPrice = ToTree(nodes, start, mid - 1);
-    byName ? node->pRightByName : node->pRightByPrice = ToTree(nodes, mid + 1, end);
+    if (byName) {
+        node->pLeftByName = ToTree(nodes, start, mid - 1, byName);
+        node->pRightByName = ToTree(nodes, mid + 1, end, byName);
+    } else {
+        node->pLeftByPrice = ToTree(nodes, start, mid - 1, byName);
+        node->pRightByPrice = ToTree(nodes, mid + 1, end, byName);
+    }
     return node;
 }
 
 inline void BinaryTree::ToArray(Node* node, Node** nodes, int& index, bool byName) {
     if (!node) return;
-    ToArray(byName ? node->pLeftByName : node->pLeftByPrice, nodes, index);
+    ToArray(byName ? node->pLeftByName : node->pLeftByPrice, nodes, index, byName);
     if (nodes) nodes[index] = node;
     index++;
-    ToArray(byName ? node->pRightByName : node->pRightByPrice, nodes, index);
+    ToArray(byName ? node->pRightByName : node->pRightByPrice, nodes, index, byName);
 }
 
 inline std::string BinaryTree::ToString(const bool byName, const bool reverse) const {
@@ -390,7 +399,4 @@ inline void BinaryTree::Remove(Node *parent, const Node *target, const bool byNa
         }
     }
 }
-
-
-
 #endif
